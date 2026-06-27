@@ -29,8 +29,9 @@ const (
 )
 
 type ModelChoice struct {
-	ID          string `json:"id"`
-	Description string `json:"description"`
+	ID            string `json:"id"`
+	Description   string `json:"description"`
+	ContextWindow string `json:"context_window,omitempty"`
 }
 
 type Provider struct {
@@ -52,8 +53,9 @@ type Provider struct {
 }
 
 type Catalog struct {
-	ordered []Provider
-	byID    map[string]Provider
+	ordered        []Provider
+	byID           map[string]Provider
+	contextWindows map[string]string
 }
 
 func Load() (Catalog, error) {
@@ -64,8 +66,9 @@ func Load() (Catalog, error) {
 		return Catalog{}, fmt.Errorf("decode providers catalog: %w", err)
 	}
 	cat := Catalog{
-		ordered: make([]Provider, 0, len(payload.Providers)),
-		byID:    make(map[string]Provider, len(payload.Providers)),
+		ordered:        make([]Provider, 0, len(payload.Providers)),
+		byID:           make(map[string]Provider, len(payload.Providers)),
+		contextWindows: make(map[string]string),
 	}
 	for _, provider := range payload.Providers {
 		if provider.ModelTiers == nil {
@@ -73,6 +76,11 @@ func Load() (Catalog, error) {
 		}
 		cat.ordered = append(cat.ordered, provider)
 		cat.byID[provider.ID] = provider
+		for _, choice := range provider.ModelChoices {
+			if choice.ContextWindow != "" {
+				cat.contextWindows[choice.ID] = choice.ContextWindow
+			}
+		}
 	}
 	return cat, nil
 }
@@ -127,6 +135,14 @@ func (c Catalog) BuiltinSecretKeys() map[string]struct{} {
 		}
 	}
 	return keys
+}
+
+// ContextWindowFor returns the catalog-declared context window (e.g. "200K",
+// "1M") for modelID, or "" if the model is not catalogued or has no
+// context_window declared. Models that point at the same provider via
+// different ids only get a hit when the exact id is catalogued.
+func (c Catalog) ContextWindowFor(modelID string) string {
+	return c.contextWindows[modelID]
 }
 
 func SortChoices(choices []ModelChoice) []ModelChoice {

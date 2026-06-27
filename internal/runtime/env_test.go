@@ -145,3 +145,192 @@ func envToMap(env []string) map[string]string {
 	}
 	return out
 }
+
+func TestWithContextSuffix(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		name     string
+		modelID  string
+		window   string
+		expected string
+	}{
+		{"1M gets suffix", "glm-5.2", "1M", "glm-5.2[1m]"},
+		{"1M case-insensitive", "glm-5.2", "1m", "glm-5.2[1m]"},
+		{"1M with whitespace", "glm-5.2", " 1M ", "glm-5.2[1m]"},
+		{"200K unchanged", "glm-5", "200K", "glm-5"},
+		{"empty window unchanged", "glm-5.2", "", "glm-5.2"},
+		{"empty modelID stays empty", "", "1M", ""},
+		{"unknown window unchanged", "foo", "100G", "foo"},
+	}
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			if got := WithContextSuffix(tc.modelID, tc.window); got != tc.expected {
+				t.Fatalf("WithContextSuffix(%q, %q) = %q, want %q", tc.modelID, tc.window, got, tc.expected)
+			}
+		})
+	}
+}
+
+func TestCompactWindowTokens(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		window   string
+		expected string
+	}{
+		{"1M", "1000000"},
+		{"1m", "1000000"},
+		{" 1M ", "1000000"},
+		{"200K", "200000"},
+		{"262K", "262000"},
+		{"256K", "256000"},
+		{"200k", "200000"},
+		{"2M", "2000000"},
+		{"", ""},
+		{"100G", ""},
+		{"abc", ""},
+		{"1MB", ""},
+		{"KM", ""},
+	}
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.window+"->"+tc.expected, func(t *testing.T) {
+			t.Parallel()
+			if got := CompactWindowTokens(tc.window); got != tc.expected {
+				t.Fatalf("CompactWindowTokens(%q) = %q, want %q", tc.window, got, tc.expected)
+			}
+		})
+	}
+}
+
+func TestBuildEnvAnnotatesOneMContext(t *testing.T) {
+	t.Parallel()
+
+	target := profiles.Target{
+		Profile:  "minimax",
+		Family:   providers.FamilyAnthropicCompatibleNonClaude,
+		BaseURL:  "https://api.minimax.io/anthropic",
+		AuthMode: providers.AuthSecret,
+		SecretKey: "MINIMAX_API_KEY",
+		ModelTiers: map[string]string{
+			"haiku":  "MiniMax-M3",
+			"sonnet": "MiniMax-M3",
+			"opus":   "MiniMax-M3",
+		},
+		ModelContextWindows: map[string]string{
+			"haiku":  "1M",
+			"sonnet": "1M",
+			"opus":   "1M",
+		},
+	}
+
+	env, err := BuildEnv(target, config.Secrets{"MINIMAX_API_KEY": "sk-m"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := envToMap(env)
+	if got["ANTHROPIC_DEFAULT_OPUS_MODEL"] != "MiniMax-M3[1m]" {
+		t.Fatalf("opus should carry [1m] suffix, got %q", got["ANTHROPIC_DEFAULT_OPUS_MODEL"])
+	}
+	if got["ANTHROPIC_DEFAULT_SONNET_MODEL"] != "MiniMax-M3[1m]" {
+		t.Fatalf("sonnet should carry [1m] suffix, got %q", got["ANTHROPIC_DEFAULT_SONNET_MODEL"])
+	}
+	if got["ANTHROPIC_DEFAULT_HAIKU_MODEL"] != "MiniMax-M3[1m]" {
+		t.Fatalf("haiku should carry [1m] suffix, got %q", got["ANTHROPIC_DEFAULT_HAIKU_MODEL"])
+	}
+	if got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] != "1000000" {
+		t.Fatalf("CLAUDE_CODE_AUTO_COMPACT_WINDOW = %q, want 1000000", got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"])
+	}
+}
+
+func TestBuildEnvKeeps200KWindowBare(t *testing.T) {
+	t.Parallel()
+
+	target := profiles.Target{
+		Profile:  "zai",
+		Family:   providers.FamilyAnthropicCompatibleNonClaude,
+		BaseURL:  "https://api.z.ai/api/anthropic",
+		AuthMode: providers.AuthSecret,
+		SecretKey: "ZAI_API_KEY",
+		ModelTiers: map[string]string{
+			"opus": "glm-5",
+		},
+		ModelContextWindows: map[string]string{
+			"opus": "200K",
+		},
+	}
+
+	env, err := BuildEnv(target, config.Secrets{"ZAI_API_KEY": "sk-zai"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := envToMap(env)
+	if got["ANTHROPIC_DEFAULT_OPUS_MODEL"] != "glm-5" {
+		t.Fatalf("200K model should not get [1m] suffix, got %q", got["ANTHROPIC_DEFAULT_OPUS_MODEL"])
+	}
+	if got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] != "200000" {
+		t.Fatalf("CLAUDE_CODE_AUTO_COMPACT_WINDOW = %q, want 200000", got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"])
+	}
+}
+
+func TestBuildEnvSkipsAutoCompactWhenWindowUnknown(t *testing.T) {
+	t.Parallel()
+
+	target := profiles.Target{
+		Profile:  "minimax",
+		Family:   providers.FamilyAnthropicCompatibleNonClaude,
+		BaseURL:  "https://api.minimax.io/anthropic",
+		AuthMode: providers.AuthSecret,
+		SecretKey: "MINIMAX_API_KEY",
+		ModelTiers: map[string]string{
+			"opus": "MiniMax-M3",
+		},
+		// No ModelContextWindows entry — catalog has no context_window for
+		// this model, so we should not emit a misleading compact threshold.
+	}
+
+	env, err := BuildEnv(target, config.Secrets{"MINIMAX_API_KEY": "sk-m"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := envToMap(env)
+	if _, ok := got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"]; ok {
+		t.Fatalf("CLAUDE_CODE_AUTO_COMPACT_WINDOW should be absent when window unknown, got %q",
+			got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"])
+	}
+	if got["ANTHROPIC_DEFAULT_OPUS_MODEL"] != "MiniMax-M3" {
+		t.Fatalf("model should be unchanged without window info, got %q", got["ANTHROPIC_DEFAULT_OPUS_MODEL"])
+	}
+}
+
+func TestBuildEnvAutoCompactHonoursOverriddenModel(t *testing.T) {
+	t.Parallel()
+
+	target := profiles.Target{
+		Profile:  "minimax",
+		Family:   providers.FamilyAnthropicCompatibleNonClaude,
+		BaseURL:  "https://api.minimax.io/anthropic",
+		AuthMode: providers.AuthSecret,
+		SecretKey: "MINIMAX_API_KEY",
+		Model:     "MiniMax-M3",
+		ModelContextWindows: map[string]string{
+			"default": "1M",
+		},
+	}
+
+	env, err := BuildEnv(target, config.Secrets{"MINIMAX_API_KEY": "sk-m"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := envToMap(env)
+	if got["ANTHROPIC_MODEL"] != "MiniMax-M3" {
+		t.Fatalf("ANTHROPIC_MODEL = %q, want MiniMax-M3", got["ANTHROPIC_MODEL"])
+	}
+	if got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] != "1000000" {
+		t.Fatalf("CLAUDE_CODE_AUTO_COMPACT_WINDOW = %q, want 1000000 (--model override should still annotate)",
+			got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"])
+	}
+}

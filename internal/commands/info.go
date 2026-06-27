@@ -27,7 +27,41 @@ func runInfo(_ context.Context, c Context, args []string) (int, error) {
 	fmt.Fprintf(c.Output.Stdout, "Family:      %s\n", target.Family)
 	fmt.Fprintf(c.Output.Stdout, "Base URL:    %s\n", target.BaseURL)
 	if target.Model != "" {
-		fmt.Fprintf(c.Output.Stdout, "Model:       %s\n", target.Model)
+		line := target.Model
+		if cw, ok := target.ModelContextWindows["default"]; ok && cw != "" {
+			line = fmt.Sprintf("%s (%s context)", target.Model, cw)
+		}
+		fmt.Fprintf(c.Output.Stdout, "Model:       %s\n", line)
+	}
+	if len(target.ModelTiers) > 0 {
+		fmt.Fprintln(c.Output.Stdout, "Tiers:")
+		tierOrder := []string{"haiku", "sonnet", "opus", "small"}
+		seen := map[string]bool{}
+		for _, tier := range tierOrder {
+			modelID, ok := target.ModelTiers[tier]
+			if !ok {
+				continue
+			}
+			seen[tier] = true
+			cw := target.ModelContextWindows[tier]
+			if cw != "" {
+				fmt.Fprintf(c.Output.Stdout, "  %-7s  %s (%s)\n", tier+":", modelID, cw)
+			} else {
+				fmt.Fprintf(c.Output.Stdout, "  %-7s  %s\n", tier+":", modelID)
+			}
+		}
+		// Any tiers outside the standard order
+		for tier, modelID := range target.ModelTiers {
+			if seen[tier] {
+				continue
+			}
+			cw := target.ModelContextWindows[tier]
+			if cw != "" {
+				fmt.Fprintf(c.Output.Stdout, "  %-7s  %s (%s)\n", tier+":", modelID, cw)
+			} else {
+				fmt.Fprintf(c.Output.Stdout, "  %-7s  %s\n", tier+":", modelID)
+			}
+		}
 	}
 	if target.SecretKey != "" {
 		status := "configured"

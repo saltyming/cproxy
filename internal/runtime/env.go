@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/saltyming/cproxy/internal/config"
@@ -47,17 +48,27 @@ func BuildEnv(target profiles.Target, secrets config.Secrets) ([]string, error) 
 	}
 	if target.Model != "" {
 		envMap["ANTHROPIC_MODEL"] = target.Model
+		if cw, ok := target.ModelContextWindows["default"]; ok {
+			if tokens := CompactWindowTokens(cw); tokens != "" {
+				envMap["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = tokens
+			}
+		}
 	}
 	for key, value := range target.ModelTiers {
+		cw := target.ModelContextWindows[key]
+		annotated := WithContextSuffix(value, cw)
 		switch key {
 		case "haiku":
-			envMap["ANTHROPIC_DEFAULT_HAIKU_MODEL"] = value
+			envMap["ANTHROPIC_DEFAULT_HAIKU_MODEL"] = annotated
 		case "sonnet":
-			envMap["ANTHROPIC_DEFAULT_SONNET_MODEL"] = value
+			envMap["ANTHROPIC_DEFAULT_SONNET_MODEL"] = annotated
 		case "opus":
-			envMap["ANTHROPIC_DEFAULT_OPUS_MODEL"] = value
+			envMap["ANTHROPIC_DEFAULT_OPUS_MODEL"] = annotated
 		case "small":
-			envMap["ANTHROPIC_SMALL_FAST_MODEL"] = value
+			envMap["ANTHROPIC_SMALL_FAST_MODEL"] = annotated
+		}
+		if tokens := CompactWindowTokens(cw); tokens != "" {
+			envMap["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = tokens
 		}
 	}
 
@@ -80,6 +91,48 @@ func BuildEnv(target profiles.Target, secrets config.Secrets) ([]string, error) 
 	}
 
 	return flattenEnv(envMap), nil
+}
+
+// WithContextSuffix appends "[1m]" to modelID when ctxWindow names the
+// 1M variant, mirroring Claude Code's own convention for its built-in
+// models. The Anthropic-format provider on the other end of the gateway
+// is expected to translate or strip the suffix as needed; for non-1M
+// windows (or empty values) the model ID is returned unchanged.
+func WithContextSuffix(modelID, ctxWindow string) string {
+	if modelID == "" {
+		return ""
+	}
+	if strings.EqualFold(strings.TrimSpace(ctxWindow), "1M") {
+		return modelID + "[1m]"
+	}
+	return modelID
+}
+
+// CompactWindowTokens converts a catalog context window string like
+// "200K", "262K", or "1M" into a raw token count string ("200000",
+// "262000", "1000000") suitable for CLAUDE_CODE_AUTO_COMPACT_WINDOW.
+// Unrecognized values return "" so the caller can omit the env entry.
+func CompactWindowTokens(ctxWindow string) string {
+	s := strings.TrimSpace(ctxWindow)
+	if s == "" {
+		return ""
+	}
+	upper := strings.ToUpper(s)
+	switch {
+	case strings.HasSuffix(upper, "M"):
+		n, err := strconv.Atoi(strings.TrimSuffix(upper, "M"))
+		if err != nil {
+			return ""
+		}
+		return strconv.Itoa(n * 1_000_000)
+	case strings.HasSuffix(upper, "K"):
+		n, err := strconv.Atoi(strings.TrimSuffix(upper, "K"))
+		if err != nil {
+			return ""
+		}
+		return strconv.Itoa(n * 1_000)
+	}
+	return ""
 }
 
 func clearAnthropicEnv(envMap map[string]string) {

@@ -11,18 +11,19 @@ import (
 )
 
 type Target struct {
-	Profile          string
-	DisplayName      string
-	Description      string
-	Category         string
-	Family           providers.Family
-	BaseURL          string
-	Model            string
-	ModelTiers       map[string]string
-	AuthMode         providers.AuthMode
-	SecretKey        string
-	LiteralAuthToken string
-	TestURL          string
+	Profile             string
+	DisplayName         string
+	Description         string
+	Category            string
+	Family              providers.Family
+	BaseURL             string
+	Model               string
+	ModelTiers          map[string]string
+	ModelContextWindows map[string]string
+	AuthMode            providers.AuthMode
+	SecretKey           string
+	LiteralAuthToken    string
+	TestURL             string
 }
 
 func Invocation(argv0 string) (string, bool) {
@@ -50,18 +51,19 @@ func Resolve(profile string, catalog providers.Catalog, cfg *config.File) (Targe
 			}
 		}
 		return Target{
-			Profile:          profile,
-			DisplayName:      provider.DisplayName,
-			Description:      provider.Description,
-			Category:         provider.Category,
-			Family:           provider.Family,
-			BaseURL:          provider.BaseURL,
-			Model:            model,
-			ModelTiers:       compactModelTiers(modelTiers),
-			AuthMode:         provider.AuthMode,
-			SecretKey:        provider.KeyVar,
-			LiteralAuthToken: provider.LiteralAuthToken,
-			TestURL:          provider.TestURL,
+			Profile:             profile,
+			DisplayName:         provider.DisplayName,
+			Description:         provider.Description,
+			Category:            provider.Category,
+			Family:              provider.Family,
+			BaseURL:             provider.BaseURL,
+			Model:               model,
+			ModelTiers:          compactModelTiers(modelTiers),
+			ModelContextWindows: collectContextWindows(catalog, model, modelTiers),
+			AuthMode:            provider.AuthMode,
+			SecretKey:           provider.KeyVar,
+			LiteralAuthToken:    provider.LiteralAuthToken,
+			TestURL:             provider.TestURL,
 		}, nil
 	}
 	if strings.HasPrefix(profile, "or-") {
@@ -130,6 +132,27 @@ func copyMap(input map[string]string) map[string]string {
 	out := make(map[string]string, len(input))
 	for key, value := range input {
 		out[key] = value
+	}
+	return out
+}
+
+// collectContextWindows maps each tier ("haiku"/"sonnet"/"opus"/"small")
+// plus the literal "default" key to the catalog-declared context window of
+// the model that tier resolves to. Models without a catalogued context
+// window are omitted so callers can tell "unknown" from "explicit empty".
+func collectContextWindows(catalog providers.Catalog, defaultModel string, tiers map[string]string) map[string]string {
+	out := map[string]string{}
+	for tier, modelID := range tiers {
+		if cw := catalog.ContextWindowFor(modelID); cw != "" {
+			out[tier] = cw
+		}
+	}
+	if defaultModel != "" {
+		if cw := catalog.ContextWindowFor(defaultModel); cw != "" {
+			if _, exists := out["default"]; !exists {
+				out["default"] = cw
+			}
+		}
 	}
 	return out
 }

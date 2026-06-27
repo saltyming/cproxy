@@ -33,19 +33,23 @@
       "model_choices": [
         {
           "id": "glm-5.2",
-          "description": "GLM-5.2"
+          "description": "GLM-5.2",
+          "context_window": "1M"
         },
         {
           "id": "glm-5.1",
-          "description": "GLM-5.1"
+          "description": "GLM-5.1",
+          "context_window": "200K"
         },
         {
           "id": "glm-5",
-          "description": "GLM-5"
+          "description": "GLM-5",
+          "context_window": "200K"
         },
         {
           "id": "glm-4.7",
-          "description": "GLM-4.7"
+          "description": "GLM-4.7",
+          "context_window": "200K"
         }
       ],
       "test_url": "https://api.z.ai/api/anthropic",
@@ -70,19 +74,23 @@
       "model_choices": [
         {
           "id": "glm-5.2",
-          "description": "GLM-5.2"
+          "description": "GLM-5.2",
+          "context_window": "1M"
         },
         {
           "id": "glm-5.1",
-          "description": "GLM-5.1"
+          "description": "GLM-5.1",
+          "context_window": "200K"
         },
         {
           "id": "glm-5",
-          "description": "GLM-5"
+          "description": "GLM-5",
+          "context_window": "200K"
         },
         {
           "id": "glm-4.7",
-          "description": "GLM-4.7"
+          "description": "GLM-4.7",
+          "context_window": "200K"
         }
       ],
       "test_url": "https://open.bigmodel.cn/api/anthropic",
@@ -108,35 +116,43 @@
       "model_choices": [
         {
           "id": "MiniMax-M3",
-          "description": "MiniMax M3"
+          "description": "MiniMax M3",
+          "context_window": "1M"
         },
         {
           "id": "MiniMax-M2.7",
-          "description": "MiniMax M2.7"
+          "description": "MiniMax M2.7",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2.7-highspeed",
-          "description": "MiniMax M2.7 Highspeed"
+          "description": "MiniMax M2.7 Highspeed",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2.5",
-          "description": "MiniMax M2.5"
+          "description": "MiniMax M2.5",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2.5-highspeed",
-          "description": "MiniMax M2.5 Highspeed"
+          "description": "MiniMax M2.5 Highspeed",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2.1",
-          "description": "MiniMax M2.1"
+          "description": "MiniMax M2.1",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2.1-highspeed",
-          "description": "MiniMax M2.1 Highspeed"
+          "description": "MiniMax M2.1 Highspeed",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2",
-          "description": "MiniMax M2"
+          "description": "MiniMax M2",
+          "context_window": "256K"
         }
       ],
       "test_url": "https://api.minimax.io/anthropic",
@@ -162,35 +178,43 @@
       "model_choices": [
         {
           "id": "MiniMax-M3",
-          "description": "MiniMax M3"
+          "description": "MiniMax M3",
+          "context_window": "1M"
         },
         {
           "id": "MiniMax-M2.7",
-          "description": "MiniMax M2.7"
+          "description": "MiniMax M2.7",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2.7-highspeed",
-          "description": "MiniMax M2.7 Highspeed"
+          "description": "MiniMax M2.7 Highspeed",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2.5",
-          "description": "MiniMax M2.5"
+          "description": "MiniMax M2.5",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2.5-highspeed",
-          "description": "MiniMax M2.5 Highspeed"
+          "description": "MiniMax M2.5 Highspeed",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2.1",
-          "description": "MiniMax M2.1"
+          "description": "MiniMax M2.1",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2.1-highspeed",
-          "description": "MiniMax M2.1 Highspeed"
+          "description": "MiniMax M2.1 Highspeed",
+          "context_window": "256K"
         },
         {
           "id": "MiniMax-M2",
-          "description": "MiniMax M2"
+          "description": "MiniMax M2",
+          "context_window": "256K"
         }
       ],
       "test_url": "https://api.minimaxi.com/anthropic",
@@ -213,11 +237,13 @@
       "model_choices": [
         {
           "id": "kimi-k2.7-code",
-          "description": "Kimi K2.7 Code"
+          "description": "Kimi K2.7 Code",
+          "context_window": "262K"
         },
         {
           "id": "kimi-k2.5",
-          "description": "Kimi K2.5"
+          "description": "Kimi K2.5",
+          "context_window": "256K"
         }
       ],
       "test_url": "https://api.kimi.com/coding/",
@@ -238,11 +264,13 @@
       "model_choices": [
         {
           "id": "kimi-k2.7-code",
-          "description": "Kimi K2.7 Code"
+          "description": "Kimi K2.7 Code",
+          "context_window": "262K"
         },
         {
           "id": "kimi-k2.5",
-          "description": "Kimi K2.5"
+          "description": "Kimi K2.5",
+          "context_window": "256K"
         }
       ],
       "test_url": "https://api.moonshot.ai/anthropic",
@@ -281,11 +309,13 @@
       "model_choices": [
         {
           "id": "deepseek-v4-flash",
-          "description": "DeepSeek V4 Flash"
+          "description": "DeepSeek V4 Flash",
+          "context_window": "1M"
         },
         {
           "id": "deepseek-v4-pro",
-          "description": "DeepSeek V4 Pro"
+          "description": "DeepSeek V4 Pro",
+          "context_window": "1M"
         }
       ],
       "test_url": "https://api.deepseek.com/anthropic",
@@ -343,51 +373,68 @@
       "model_choices": [
         {
           "id": "qwen3.5-plus",
-          "description": "Qwen 3.5 Plus"
+          "description": "Qwen 3.5 Plus",
+          "context_window": "1M"
         },
         {
           "id": "kimi-k2.7-code",
-          "description": "Kimi K2.7 Code"
+          "description": "Kimi K2.7 Code",
+          "context_window": "262K"
         },
         {
           "id": "kimi-k2.5",
-          "description": "Kimi K2.5"
+          "description": "Kimi K2.5",
+          "context_window": "256K"
         },
         {
           "id": "glm-5.2",
-          "description": "GLM-5.2"
+          "description": "GLM-5.2",
+          "context_window": "1M"
         },
         {
           "id": "glm-5.1",
-          "description": "GLM-5.1"
+          "description": "GLM-5.1",
+          "context_window": "200K"
         },
         {
           "id": "glm-5",
-          "description": "GLM-5"
+          "description": "GLM-5",
+          "context_window": "200K"
         },
         {
           "id": "MiniMax-M3",
-          "description": "MiniMax M3"
+          "description": "MiniMax M3",
+          "context_window": "1M"
         },
         {
           "id": "MiniMax-M2.5",
-          "description": "MiniMax M2.5"
+          "description": "MiniMax M2.5",
+          "context_window": "256K"
         },
         {
           "id": "qwen3-coder-next",
-          "description": "Qwen3 Coder Next"
+          "description": "Qwen3 Coder Next",
+          "context_window": "1M"
         },
         {
           "id": "qwen3-coder-plus",
-          "description": "Qwen3 Coder Plus"
+          "description": "Qwen3 Coder Plus",
+          "context_window": "1M"
+        },
+        {
+          "id": "qwen3-coder-flash",
+          "description": "Qwen3 Coder Flash",
+          "context_window": "1M"
         },
         {
           "id": "qwen3-max-2026-01-23",
-          "description": "Qwen3 Max"
+          "description": "Qwen3 Max",
+          "context_window": "1M"
         },
         {
           "id": "glm-4.7",
-          "description": "GLM-4.7"
+          "description": "GLM-4.7",
+          "context_window": "200K"
         }
       ],
       "test_url": "https://coding-intl.dashscope.aliyuncs.com/apps/anthropic",
@@ -412,51 +459,68 @@
       "model_choices": [
         {
           "id": "qwen3.5-plus",
-          "description": "Qwen 3.5 Plus"
+          "description": "Qwen 3.5 Plus",
+          "context_window": "1M"
         },
         {
           "id": "kimi-k2.7-code",
-          "description": "Kimi K2.7 Code"
+          "description": "Kimi K2.7 Code",
+          "context_window": "262K"
         },
         {
           "id": "kimi-k2.5",
-          "description": "Kimi K2.5"
+          "description": "Kimi K2.5",
+          "context_window": "256K"
         },
         {
           "id": "glm-5.2",
-          "description": "GLM-5.2"
+          "description": "GLM-5.2",
+          "context_window": "1M"
         },
         {
           "id": "glm-5.1",
-          "description": "GLM-5.1"
+          "description": "GLM-5.1",
+          "context_window": "200K"
         },
         {
           "id": "glm-5",
-          "description": "GLM-5"
+          "description": "GLM-5",
+          "context_window": "200K"
         },
         {
           "id": "MiniMax-M3",
-          "description": "MiniMax M3"
+          "description": "MiniMax M3",
+          "context_window": "1M"
         },
         {
           "id": "MiniMax-M2.5",
-          "description": "MiniMax M2.5"
+          "description": "MiniMax M2.5",
+          "context_window": "256K"
         },
         {
           "id": "qwen3-coder-next",
-          "description": "Qwen3 Coder Next"
+          "description": "Qwen3 Coder Next",
+          "context_window": "1M"
         },
         {
           "id": "qwen3-coder-plus",
-          "description": "Qwen3 Coder Plus"
+          "description": "Qwen3 Coder Plus",
+          "context_window": "1M"
+        },
+        {
+          "id": "qwen3-coder-flash",
+          "description": "Qwen3 Coder Flash",
+          "context_window": "1M"
         },
         {
           "id": "qwen3-max-2026-01-23",
-          "description": "Qwen3 Max"
+          "description": "Qwen3 Max",
+          "context_window": "1M"
         },
         {
           "id": "glm-4.7",
-          "description": "GLM-4.7"
+          "description": "GLM-4.7",
+          "context_window": "200K"
         }
       ],
       "test_url": "https://coding-us.dashscope.aliyuncs.com/apps/anthropic",
@@ -481,51 +545,68 @@
       "model_choices": [
         {
           "id": "qwen3.5-plus",
-          "description": "Qwen 3.5 Plus"
+          "description": "Qwen 3.5 Plus",
+          "context_window": "1M"
         },
         {
           "id": "kimi-k2.7-code",
-          "description": "Kimi K2.7 Code"
+          "description": "Kimi K2.7 Code",
+          "context_window": "262K"
         },
         {
           "id": "kimi-k2.5",
-          "description": "Kimi K2.5"
+          "description": "Kimi K2.5",
+          "context_window": "256K"
         },
         {
           "id": "glm-5.2",
-          "description": "GLM-5.2"
+          "description": "GLM-5.2",
+          "context_window": "1M"
         },
         {
           "id": "glm-5.1",
-          "description": "GLM-5.1"
+          "description": "GLM-5.1",
+          "context_window": "200K"
         },
         {
           "id": "glm-5",
-          "description": "GLM-5"
+          "description": "GLM-5",
+          "context_window": "200K"
         },
         {
           "id": "MiniMax-M3",
-          "description": "MiniMax M3"
+          "description": "MiniMax M3",
+          "context_window": "1M"
         },
         {
           "id": "MiniMax-M2.5",
-          "description": "MiniMax M2.5"
+          "description": "MiniMax M2.5",
+          "context_window": "256K"
         },
         {
           "id": "qwen3-coder-next",
-          "description": "Qwen3 Coder Next"
+          "description": "Qwen3 Coder Next",
+          "context_window": "1M"
         },
         {
           "id": "qwen3-coder-plus",
-          "description": "Qwen3 Coder Plus"
+          "description": "Qwen3 Coder Plus",
+          "context_window": "1M"
+        },
+        {
+          "id": "qwen3-coder-flash",
+          "description": "Qwen3 Coder Flash",
+          "context_window": "1M"
         },
         {
           "id": "qwen3-max-2026-01-23",
-          "description": "Qwen3 Max"
+          "description": "Qwen3 Max",
+          "context_window": "1M"
         },
         {
           "id": "glm-4.7",
-          "description": "GLM-4.7"
+          "description": "GLM-4.7",
+          "context_window": "200K"
         }
       ],
       "test_url": "https://coding.dashscope.aliyuncs.com/apps/anthropic",
