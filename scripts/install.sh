@@ -5,10 +5,10 @@ if [[ $# -eq 0 ]]; then
   set -- install
 fi
 
-REPO="jolehuit/clother"
-VERSION="${CLOTHER_VERSION:-latest}"
-RELEASE_BASE_URL="${CLOTHER_RELEASE_BASE_URL:-}"
-INSTALL_MODE="${CLOTHER_INSTALL_MODE:-auto}"
+REPO="saltyming/cproxy"
+VERSION="${CPROXY_VERSION:-latest}"
+RELEASE_BASE_URL="${CPROXY_RELEASE_BASE_URL:-}"
+INSTALL_MODE="${CPROXY_INSTALL_MODE:-auto}"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
@@ -16,11 +16,11 @@ run_from_source() {
   local source_dir="$1"
   shift
   command -v go >/dev/null 2>&1 || {
-    echo "go is required to build clother from source" >&2
+    echo "go is required to build cproxy from source" >&2
     exit 1
   }
   cd "$source_dir"
-  exec go run ./cmd/clother "$@"
+  exec go run ./cmd/cproxy "$@"
 }
 
 detect_os() {
@@ -68,14 +68,14 @@ verify_checksum() {
 
 if [[ "$INSTALL_MODE" != "release" && -n "${BASH_SOURCE[0]:-}" && -f "${BASH_SOURCE[0]}" ]]; then
   SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-  if [[ -f "$SOURCE_DIR/go.mod" && -d "$SOURCE_DIR/cmd/clother" ]]; then
+  if [[ -f "$SOURCE_DIR/go.mod" && -d "$SOURCE_DIR/cmd/cproxy" ]]; then
     run_from_source "$SOURCE_DIR" "$@"
   fi
 fi
 
 OS="$(detect_os)"
 ARCH="$(detect_arch)"
-ASSET="clother_${OS}_${ARCH}.tar.gz"
+ASSET="cproxy_${OS}_${ARCH}.tar.gz"
 CHECKSUMS="checksums.txt"
 ASSET_PATH="$TMP_DIR/$ASSET"
 CHECKSUMS_PATH="$TMP_DIR/$CHECKSUMS"
@@ -85,5 +85,5 @@ curl -fsSL "$(download_url "$CHECKSUMS")" -o "$CHECKSUMS_PATH"
 verify_checksum "$ASSET_PATH" "$CHECKSUMS_PATH"
 
 tar -xzf "$ASSET_PATH" -C "$TMP_DIR"
-chmod +x "$TMP_DIR/clother"
-exec "$TMP_DIR/clother" "$@"
+chmod +x "$TMP_DIR/cproxy"
+exec "$TMP_DIR/cproxy" "$@"

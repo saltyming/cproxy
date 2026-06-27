@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/jolehuit/clother/internal/profiles"
-	"github.com/jolehuit/clother/internal/providers"
+	"github.com/saltyming/cproxy/internal/profiles"
+	"github.com/saltyming/cproxy/internal/providers"
 )
 
 func TestPrepareClaudeConfigOverlayMirrorsConfigAndPinsModel(t *testing.T) {
@@ -33,7 +33,7 @@ func TestPrepareClaudeConfigOverlayMirrorsConfigAndPinsModel(t *testing.T) {
 		Family: providers.FamilyAnthropicCompatibleNonClaude,
 		Model:  "qwen3.5-plus",
 	}
-	env, cleanup, err := PrepareClaudeConfigOverlay(target, []string{"--model", "glm-5"}, []string{
+	env, cleanup, err := PrepareClaudeConfigOverlay(target, []string{"--model", "glm-5.2"}, []string{
 		"PATH=/usr/bin",
 		"ANTHROPIC_BASE_URL=https://coding-intl.dashscope.aliyuncs.com/apps/anthropic",
 		"ANTHROPIC_AUTH_TOKEN=secret-token",
@@ -58,8 +58,8 @@ func TestPrepareClaudeConfigOverlayMirrorsConfigAndPinsModel(t *testing.T) {
 	if err := json.Unmarshal(settingsData, &settings); err != nil {
 		t.Fatal(err)
 	}
-	if settings["model"] != "glm-5" {
-		t.Fatalf("patched model = %v, want glm-5", settings["model"])
+	if settings["model"] != "glm-5.2" {
+		t.Fatalf("patched model = %v, want glm-5.2", settings["model"])
 	}
 	settingsEnv, ok := settings["env"].(map[string]any)
 	if !ok {
@@ -68,14 +68,14 @@ func TestPrepareClaudeConfigOverlayMirrorsConfigAndPinsModel(t *testing.T) {
 	if settingsEnv["KEEP_ME"] != "1" {
 		t.Fatalf("patched env lost KEEP_ME: %+v", settingsEnv)
 	}
-	if settingsEnv["ANTHROPIC_MODEL"] != "glm-5" {
-		t.Fatalf("patched ANTHROPIC_MODEL = %v, want glm-5", settingsEnv["ANTHROPIC_MODEL"])
+	if settingsEnv["ANTHROPIC_MODEL"] != "glm-5.2" {
+		t.Fatalf("patched ANTHROPIC_MODEL = %v, want glm-5.2", settingsEnv["ANTHROPIC_MODEL"])
 	}
-	if settingsEnv["ANTHROPIC_DEFAULT_OPUS_MODEL"] != "glm-5" {
-		t.Fatalf("patched ANTHROPIC_DEFAULT_OPUS_MODEL = %v, want glm-5", settingsEnv["ANTHROPIC_DEFAULT_OPUS_MODEL"])
+	if settingsEnv["ANTHROPIC_DEFAULT_OPUS_MODEL"] != "glm-5.2" {
+		t.Fatalf("patched ANTHROPIC_DEFAULT_OPUS_MODEL = %v, want glm-5.2", settingsEnv["ANTHROPIC_DEFAULT_OPUS_MODEL"])
 	}
-	if settingsEnv["CLAUDE_CODE_SUBAGENT_MODEL"] != "glm-5" {
-		t.Fatalf("patched CLAUDE_CODE_SUBAGENT_MODEL = %v, want glm-5", settingsEnv["CLAUDE_CODE_SUBAGENT_MODEL"])
+	if settingsEnv["CLAUDE_CODE_SUBAGENT_MODEL"] != "glm-5.2" {
+		t.Fatalf("patched CLAUDE_CODE_SUBAGENT_MODEL = %v, want glm-5.2", settingsEnv["CLAUDE_CODE_SUBAGENT_MODEL"])
 	}
 	markerPath := filepath.Join(overlayDir, "teams")
 	info, err := os.Lstat(markerPath)

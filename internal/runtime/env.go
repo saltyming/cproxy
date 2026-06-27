@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/profiles"
-	"github.com/jolehuit/clother/internal/providers"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/profiles"
+	"github.com/saltyming/cproxy/internal/providers"
 )
 
 // IsHomebrew reports whether the running binary is managed by Homebrew.

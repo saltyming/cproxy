@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/jolehuit/clother/internal/profiles"
-	"github.com/jolehuit/clother/internal/version"
+	"github.com/saltyming/cproxy/internal/profiles"
+	"github.com/saltyming/cproxy/internal/version"
 )
 
 func runStatus(_ context.Context, c Context) (int, error) {
@@ -23,7 +23,7 @@ func runStatus(_ context.Context, c Context) (int, error) {
 		fmt.Fprintln(c.Output.Stdout, string(data))
 		return 0, nil
 	}
-	c.Output.Header("Clother Status")
+	c.Output.Header("Cproxy Status")
 	fmt.Fprintf(c.Output.Stdout, "Version:   %s\n", version.Value)
 	fmt.Fprintf(c.Output.Stdout, "Config:    %s\n", c.Paths.ConfigDir)
 	fmt.Fprintf(c.Output.Stdout, "Data:      %s\n", c.Paths.DataDir)

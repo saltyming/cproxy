@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/profiles"
-	"github.com/jolehuit/clother/internal/providers"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/profiles"
+	"github.com/saltyming/cproxy/internal/providers"
 )
 
 func TestBuildEnvForOpenRouter(t *testing.T) {
@@ -115,7 +115,7 @@ func TestBuildEnvClearsUnusedTierVariables(t *testing.T) {
 		AuthMode:  providers.AuthSecret,
 		SecretKey: "ZAI_API_KEY",
 		ModelTiers: map[string]string{
-			"opus": "glm-5",
+			"opus": "glm-5.2",
 		},
 	}
 
@@ -124,7 +124,7 @@ func TestBuildEnvClearsUnusedTierVariables(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := envToMap(env)
-	if got["ANTHROPIC_DEFAULT_OPUS_MODEL"] != "glm-5" {
+	if got["ANTHROPIC_DEFAULT_OPUS_MODEL"] != "glm-5.2" {
 		t.Fatalf("unexpected opus model: %q", got["ANTHROPIC_DEFAULT_OPUS_MODEL"])
 	}
 	if _, ok := got["ANTHROPIC_DEFAULT_HAIKU_MODEL"]; ok {

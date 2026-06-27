@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jolehuit/clother/internal/config"
+	"github.com/saltyming/cproxy/internal/config"
 )
 
 type Patch struct {

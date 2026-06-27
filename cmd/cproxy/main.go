@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jolehuit/clother/internal/app"
+	"github.com/saltyming/cproxy/internal/app"
 )
 
 func main() {

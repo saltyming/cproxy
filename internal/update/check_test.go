@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jolehuit/clother/internal/config"
+	"github.com/saltyming/cproxy/internal/config"
 )
 
 func TestIsNewer(t *testing.T) {
@@ -42,7 +42,7 @@ func TestMaybeMessageFetchesAndCachesUpdate(t *testing.T) {
 	if calls != 1 {
 		t.Fatalf("expected one remote fetch, got %d", calls)
 	}
-	if !strings.Contains(msg, "v3.0.1") || !strings.Contains(msg, "clother install") {
+	if !strings.Contains(msg, "v3.0.1") || !strings.Contains(msg, "cproxy install") {
 		t.Fatalf("unexpected message: %q", msg)
 	}
 

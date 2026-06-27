@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/jolehuit/clother/internal/providers"
+	"github.com/saltyming/cproxy/internal/providers"
 )
 
 var envKeyPattern = regexp.MustCompile(`^[A-Z_][A-Z0-9_]*$`)
@@ -90,8 +90,8 @@ func NormalizeLegacySecrets(secrets Secrets, catalog providers.Catalog) {
 			if looksLikeLauncherName(value) || normalizeOpenRouterAliasName(strings.ToLower(strings.ReplaceAll(strings.TrimPrefix(key, "OPENROUTER_MODEL_"), "_", "-"))) == "" {
 				delete(secrets, key)
 			}
-		case strings.HasPrefix(key, "CLOTHER_") && strings.HasSuffix(key, "_BASE_URL"):
-			secretKey := strings.TrimSuffix(strings.TrimPrefix(key, "CLOTHER_"), "_BASE_URL")
+		case strings.HasPrefix(key, "CPROXY_") && strings.HasSuffix(key, "_BASE_URL"):
+			secretKey := strings.TrimSuffix(strings.TrimPrefix(key, "CPROXY_"), "_BASE_URL")
 			if _, ok := builtinSecretKeys[secretKey]; ok {
 				delete(secrets, key)
 			}

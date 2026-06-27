@@ -8,15 +8,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jolehuit/clother/internal/cli"
-	"github.com/jolehuit/clother/internal/commands"
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/profiles"
-	"github.com/jolehuit/clother/internal/providers"
-	"github.com/jolehuit/clother/internal/runtime"
-	"github.com/jolehuit/clother/internal/ui"
-	"github.com/jolehuit/clother/internal/update"
-	"github.com/jolehuit/clother/internal/version"
+	"github.com/saltyming/cproxy/internal/cli"
+	"github.com/saltyming/cproxy/internal/commands"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/profiles"
+	"github.com/saltyming/cproxy/internal/providers"
+	"github.com/saltyming/cproxy/internal/runtime"
+	"github.com/saltyming/cproxy/internal/ui"
+	"github.com/saltyming/cproxy/internal/update"
+	"github.com/saltyming/cproxy/internal/version"
 )
 
 type App struct {
@@ -92,24 +92,24 @@ func Run(ctx context.Context, args []string, argv0 string) (int, error) {
 		cfg.ApplyLegacySecrets(secrets, catalog)
 		cfg.Normalize(catalog)
 
-		// Gateway invocations: clother-or <alias> and clother-custom <name>
+		// Gateway invocations: cproxy-or <alias> and cproxy-custom <name>
 		// let the user invoke any dynamic provider without a dedicated symlink.
 		// Config is loaded first so we can validate the name against known providers.
 		if profile == "or" {
 			if len(forwarded) == 0 || strings.HasPrefix(forwarded[0], "-") {
-				fmt.Fprintln(os.Stderr, "usage: clother-or <alias> [args...]\n\nRun `clother config openrouter` to configure aliases.")
+				fmt.Fprintln(os.Stderr, "usage: cproxy-or <alias> [args...]\n\nRun `cproxy config openrouter` to configure aliases.")
 				return 1, nil
 			}
 			profile = "or-" + forwarded[0]
 			forwarded = forwarded[1:]
 		} else if profile == "custom" {
 			if len(forwarded) == 0 || strings.HasPrefix(forwarded[0], "-") {
-				fmt.Fprintln(os.Stderr, "usage: clother-custom <provider-name> [args...]\n\nRun `clother config custom` to configure a custom provider.")
+				fmt.Fprintln(os.Stderr, "usage: cproxy-custom <provider-name> [args...]\n\nRun `cproxy config custom` to configure a custom provider.")
 				return 1, nil
 			}
 			name := forwarded[0]
 			if _, ok := cfg.CustomProviders[name]; !ok {
-				return 1, fmt.Errorf("unknown custom provider %q — run `clother config custom` to configure one", name)
+				return 1, fmt.Errorf("unknown custom provider %q — run `cproxy config custom` to configure one", name)
 			}
 			profile = name
 			forwarded = forwarded[1:]
@@ -132,7 +132,7 @@ func Run(ctx context.Context, args []string, argv0 string) (int, error) {
 	}
 
 	if parsed.Options.Version {
-		fmt.Fprintf(app.Output.Stdout, "Clother v%s\n", version.Value)
+		fmt.Fprintf(app.Output.Stdout, "Cproxy v%s\n", version.Value)
 		return 0, nil
 	}
 

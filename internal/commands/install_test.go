@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/providers"
-	"github.com/jolehuit/clother/internal/ui"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/providers"
+	"github.com/saltyming/cproxy/internal/ui"
 )
 
 func TestRunInstallPreservesSameBinClaude(t *testing.T) {
@@ -23,8 +23,8 @@ func TestRunInstallPreservesSameBinClaude(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
 	t.Setenv("XDG_DATA_HOME", filepath.Join(home, ".local", "share"))
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(home, ".cache"))
-	t.Setenv("CLOTHER_BIN", binDir)
-	t.Setenv("CLOTHER_SKIP_SELF_UPDATE", "1")
+	t.Setenv("CPROXY_BIN", binDir)
+	t.Setenv("CPROXY_SKIP_SELF_UPDATE", "1")
 
 	if err := os.MkdirAll(binDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -89,7 +89,8 @@ func TestRunInstallUpgradesToLatestRelease(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
 	t.Setenv("XDG_DATA_HOME", filepath.Join(home, ".local", "share"))
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(home, ".cache"))
-	t.Setenv("CLOTHER_BIN", binDir)
+	t.Setenv("CPROXY_BIN", binDir)
+	t.Setenv("HOMEBREW_PREFIX", "")
 
 	if err := os.MkdirAll(binDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -102,7 +103,7 @@ func TestRunInstallUpgradesToLatestRelease(t *testing.T) {
 	oldPath := os.Getenv("PATH")
 	t.Setenv("PATH", binDir+string(os.PathListSeparator)+oldPath)
 
-	releaseBinary := filepath.Join(root, "release-clother")
+	releaseBinary := filepath.Join(root, "release-cproxy")
 	if err := os.WriteFile(releaseBinary, []byte("#!/bin/sh\necho release-3.0.3\n"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -143,12 +144,12 @@ func TestRunInstallUpgradesToLatestRelease(t *testing.T) {
 		t.Fatalf("runInstall() code = %d, want 0", code)
 	}
 
-	installed, err := os.ReadFile(filepath.Join(binDir, "clother"))
+	installed, err := os.ReadFile(filepath.Join(binDir, "cproxy"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(string(installed), "release-3.0.3") {
-		t.Fatalf("expected installed clother to come from latest release, got %q", string(installed))
+		t.Fatalf("expected installed cproxy to come from latest release, got %q", string(installed))
 	}
 }
 
@@ -162,8 +163,8 @@ func TestRunInstallWarnsWhenBinDirIsNotOnPath(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
 	t.Setenv("XDG_DATA_HOME", filepath.Join(home, ".local", "share"))
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(home, ".cache"))
-	t.Setenv("CLOTHER_BIN", binDir)
-	t.Setenv("CLOTHER_SKIP_SELF_UPDATE", "1")
+	t.Setenv("CPROXY_BIN", binDir)
+	t.Setenv("CPROXY_SKIP_SELF_UPDATE", "1")
 
 	if err := os.MkdirAll(realClaudeDir, 0o755); err != nil {
 		t.Fatal(err)

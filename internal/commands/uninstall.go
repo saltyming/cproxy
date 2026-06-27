@@ -6,12 +6,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/jolehuit/clother/internal/launchers"
+	"github.com/saltyming/cproxy/internal/launchers"
 )
 
 func runUninstall(_ context.Context, c Context) (int, error) {
 	if !c.Options.Yes {
-		ok, err := c.Prompt.Confirm("Remove all Clother files?", false)
+		ok, err := c.Prompt.Confirm("Remove all Cproxy files?", false)
 		if err != nil {
 			return 1, err
 		}
@@ -24,10 +24,10 @@ func runUninstall(_ context.Context, c Context) (int, error) {
 		_ = os.Remove(filepath.Join(c.Paths.BinDir, name))
 	}
 	_ = os.Remove(filepath.Join(c.Paths.BinDir, "claude"))
-	_ = os.Remove(filepath.Join(c.Paths.BinDir, "clother"))
+	_ = os.Remove(filepath.Join(c.Paths.BinDir, "cproxy"))
 	_ = os.RemoveAll(c.Paths.ConfigDir)
 	_ = os.RemoveAll(c.Paths.DataDir)
 	_ = os.RemoveAll(c.Paths.CacheDir)
-	fmt.Fprintln(c.Output.Stdout, "Clother uninstalled")
+	fmt.Fprintln(c.Output.Stdout, "Cproxy uninstalled")
 	return 0, nil
 }

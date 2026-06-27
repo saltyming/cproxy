@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/session"
-	"github.com/jolehuit/clother/internal/update"
-	"github.com/jolehuit/clother/internal/version"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/session"
+	"github.com/saltyming/cproxy/internal/update"
+	"github.com/saltyming/cproxy/internal/version"
 )
 
 func RunClaudeShim(ctx context.Context, paths config.Paths, args []string) (int, error) {

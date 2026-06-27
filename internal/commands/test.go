@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jolehuit/clother/internal/profiles"
+	"github.com/saltyming/cproxy/internal/profiles"
 )
 
 func runTest(_ context.Context, c Context, args []string) (int, error) {

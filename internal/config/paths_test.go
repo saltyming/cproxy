@@ -23,7 +23,7 @@ func TestDetectPrefersClaudeDirWhenNotOverridden(t *testing.T) {
 	t.Setenv("XDG_DATA_HOME", filepath.Join(home, ".local", "share"))
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(home, ".cache"))
 	t.Setenv("PATH", claudeDir)
-	t.Setenv("CLOTHER_BIN", "")
+	t.Setenv("CPROXY_BIN", "")
 
 	paths, err := Detect("")
 	if err != nil {
@@ -34,7 +34,7 @@ func TestDetectPrefersClaudeDirWhenNotOverridden(t *testing.T) {
 	}
 }
 
-func TestDetectPrefersCLOTHERBINOverClaudeDir(t *testing.T) {
+func TestDetectPrefersCPROXYBINOverClaudeDir(t *testing.T) {
 	root := t.TempDir()
 	home := filepath.Join(root, "home")
 	claudeDir := filepath.Join(root, "claude-bin")
@@ -52,7 +52,7 @@ func TestDetectPrefersCLOTHERBINOverClaudeDir(t *testing.T) {
 	t.Setenv("XDG_DATA_HOME", filepath.Join(home, ".local", "share"))
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(home, ".cache"))
 	t.Setenv("PATH", claudeDir)
-	t.Setenv("CLOTHER_BIN", overrideDir)
+	t.Setenv("CPROXY_BIN", overrideDir)
 
 	paths, err := Detect("")
 	if err != nil {
@@ -82,7 +82,7 @@ func TestDetectPrefersExplicitFlagOverEnvAndClaudeDir(t *testing.T) {
 	t.Setenv("XDG_DATA_HOME", filepath.Join(home, ".local", "share"))
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(home, ".cache"))
 	t.Setenv("PATH", claudeDir)
-	t.Setenv("CLOTHER_BIN", envDir)
+	t.Setenv("CPROXY_BIN", envDir)
 
 	paths, err := Detect(flagDir)
 	if err != nil {

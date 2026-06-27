@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"github.com/jolehuit/clother/internal/cli"
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/providers"
-	"github.com/jolehuit/clother/internal/ui"
+	"github.com/saltyming/cproxy/internal/cli"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/providers"
+	"github.com/saltyming/cproxy/internal/ui"
 )
 
 type Context struct {

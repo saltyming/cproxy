@@ -1,4 +1,4 @@
-package clother_test
+package cproxy_test
 
 import (
 	"bytes"
@@ -10,8 +10,8 @@ import (
 	"testing"
 )
 
-func TestClotherShBootstrapsInstallerWhenPipedToBash(t *testing.T) {
-	script, err := os.ReadFile("clother.sh")
+func TestCproxyShBootstrapsInstallerWhenPipedToBash(t *testing.T) {
+	script, err := os.ReadFile("cproxy.sh")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,10 +35,10 @@ printf '%%s\n' "$@" > %q
 		t.Fatal(err)
 	}
 
-	cmd := exec.Command("bash", "-s", "--", "install", "--bin-dir", "/tmp/clother-bin")
+	cmd := exec.Command("bash", "-s", "--", "install", "--bin-dir", "/tmp/cproxy-bin")
 	cmd.Dir = workdir
 	cmd.Stdin = bytes.NewReader(script)
-	cmd.Env = append(os.Environ(), "CLOTHER_BOOTSTRAP_URL=file://"+bootstrapPath)
+	cmd.Env = append(os.Environ(), "CPROXY_BOOTSTRAP_URL=file://"+bootstrapPath)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -52,7 +52,7 @@ printf '%%s\n' "$@" > %q
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := strings.TrimSpace(string(argsData)); got != "install\n--bin-dir\n/tmp/clother-bin" {
+	if got := strings.TrimSpace(string(argsData)); got != "install\n--bin-dir\n/tmp/cproxy-bin" {
 		t.Fatalf("bootstrap args = %q", got)
 	}
 }

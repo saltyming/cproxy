@@ -11,12 +11,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/profiles"
-	"github.com/jolehuit/clother/internal/session"
-	"github.com/jolehuit/clother/internal/ui"
-	"github.com/jolehuit/clother/internal/update"
-	"github.com/jolehuit/clother/internal/version"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/profiles"
+	"github.com/saltyming/cproxy/internal/session"
+	"github.com/saltyming/cproxy/internal/ui"
+	"github.com/saltyming/cproxy/internal/update"
+	"github.com/saltyming/cproxy/internal/version"
 )
 
 type RunOptions struct {
@@ -51,12 +51,12 @@ func Launch(ctx context.Context, paths config.Paths, target profiles.Target, arg
 	}
 
 	if session.RequiresClaudeSanitization(target.Family) {
-		if code, handled, err := runWithTemporaryPatch(ctx, claudePath, paths, args, env, "clother-"+target.Profile); handled {
+		if code, handled, err := runWithTemporaryPatch(ctx, claudePath, paths, args, env, "cproxy-"+target.Profile); handled {
 			return code, err
 		}
 	}
 
-	return runClaudeCommand(ctx, claudePath, args, env, "clother-"+target.Profile)
+	return runClaudeCommand(ctx, claudePath, args, env, "cproxy-"+target.Profile)
 }
 
 func runWithTemporaryPatch(ctx context.Context, claudePath string, paths config.Paths, args []string, env []string, resumeCommand string) (int, bool, error) {

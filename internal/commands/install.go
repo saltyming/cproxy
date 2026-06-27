@@ -5,11 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/launchers"
-	"github.com/jolehuit/clother/internal/runtime"
-	"github.com/jolehuit/clother/internal/update"
-	"github.com/jolehuit/clother/internal/version"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/launchers"
+	"github.com/saltyming/cproxy/internal/runtime"
+	"github.com/saltyming/cproxy/internal/update"
+	"github.com/saltyming/cproxy/internal/version"
 )
 
 var downloadLatestBinary = update.DownloadLatestIfNewer
@@ -23,9 +23,9 @@ func runInstall(ctx context.Context, c Context) (int, error) {
 
 	if isHomebrew {
 		// Homebrew manages the binary lifecycle; skip downloading and copying.
-		// os.Executable() returns the stable /opt/homebrew/bin/clother symlink
+		// os.Executable() returns the stable /opt/homebrew/bin/cproxy symlink
 		// path, so symlinks remain valid after `brew upgrade` without re-running
-		// `clother install`.
+		// `cproxy install`.
 		execPath, err = os.Executable()
 		if err != nil {
 			return 1, err
@@ -43,7 +43,7 @@ func runInstall(ctx context.Context, c Context) (int, error) {
 
 	realClaude, claudeErr := runtime.FindRealClaude(c.Paths)
 	if claudeErr != nil {
-		c.Output.Warn("claude not found; provider symlinks will be created but the `claude` shim will be skipped — run `clother install` again after installing Claude Code")
+		c.Output.Warn("claude not found; provider symlinks will be created but the `claude` shim will be skipped — run `cproxy install` again after installing Claude Code")
 	}
 	if err := runtime.PreserveRealClaude(c.Paths, realClaude); err != nil {
 		return 1, err
@@ -62,12 +62,12 @@ func runInstall(ctx context.Context, c Context) (int, error) {
 		return 1, err
 	}
 	for _, legacy := range []string{
-		filepath.Join(c.Paths.DataDir, "clother-full.sh"),
+		filepath.Join(c.Paths.DataDir, "cproxy-full.sh"),
 		filepath.Join(c.Paths.DataDir, "banner"),
 	} {
 		_ = os.Remove(legacy)
 	}
-	c.Output.Success("installed Clother %s to %s", installedVersion, c.Paths.BinDir)
+	c.Output.Success("installed Cproxy %s to %s", installedVersion, c.Paths.BinDir)
 	if !pathContainsDir(os.Getenv("PATH"), c.Paths.BinDir) {
 		c.Output.Warn("%s is not on PATH; add `export PATH=\"%s:$PATH\"` to your shell profile and restart your shell", c.Paths.BinDir, c.Paths.BinDir)
 	}

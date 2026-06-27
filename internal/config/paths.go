@@ -29,11 +29,11 @@ func Detect(binOverride string) (Paths, error) {
 	xdgDataHome := getenv("XDG_DATA_HOME", filepath.Join(home, ".local", "share"))
 	xdgCacheHome := getenv("XDG_CACHE_HOME", filepath.Join(home, ".cache"))
 
-	configDir := getenv("CLOTHER_CONFIG_DIR", filepath.Join(xdgConfigHome, "clother"))
-	dataDir := getenv("CLOTHER_DATA_DIR", filepath.Join(xdgDataHome, "clother"))
-	cacheDir := getenv("CLOTHER_CACHE_DIR", filepath.Join(xdgCacheHome, "clother"))
+	configDir := getenv("CPROXY_CONFIG_DIR", filepath.Join(xdgConfigHome, "cproxy"))
+	dataDir := getenv("CPROXY_DATA_DIR", filepath.Join(xdgDataHome, "cproxy"))
+	cacheDir := getenv("CPROXY_CACHE_DIR", filepath.Join(xdgCacheHome, "cproxy"))
 
-	binDir := getenv("CLOTHER_BIN", "")
+	binDir := getenv("CPROXY_BIN", "")
 	if binOverride != "" {
 		binDir = binOverride
 	}

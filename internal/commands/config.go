@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/launchers"
-	"github.com/jolehuit/clother/internal/providers"
-	"github.com/jolehuit/clother/internal/runtime"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/launchers"
+	"github.com/saltyming/cproxy/internal/providers"
+	"github.com/saltyming/cproxy/internal/runtime"
 )
 
 var (
@@ -46,7 +46,7 @@ func runConfig(_ context.Context, c Context, args []string) (int, error) {
 func chooseProvider(c Context) (string, error) {
 	index := 1
 	choices := map[int]string{}
-	c.Output.Header("Clother Configuration")
+	c.Output.Header("Cproxy Configuration")
 	for _, category := range c.Catalog.Categories() {
 		fmt.Fprintln(c.Output.Stdout, category)
 		for _, provider := range c.Catalog.ProvidersByCategory(category) {

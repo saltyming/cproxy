@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/providers"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/providers"
 )
 
 type Target struct {
@@ -27,11 +27,11 @@ type Target struct {
 
 func Invocation(argv0 string) (string, bool) {
 	base := filepath.Base(argv0)
-	if base == "clother" || base == "clother.sh" {
+	if base == "cproxy" || base == "cproxy.sh" {
 		return "", false
 	}
-	if strings.HasPrefix(base, "clother-") {
-		return strings.TrimPrefix(base, "clother-"), true
+	if strings.HasPrefix(base, "cproxy-") {
+		return strings.TrimPrefix(base, "cproxy-"), true
 	}
 	return "", false
 }

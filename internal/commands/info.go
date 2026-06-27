@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/jolehuit/clother/internal/profiles"
+	"github.com/saltyming/cproxy/internal/profiles"
 )
 
 func runInfo(_ context.Context, c Context, args []string) (int, error) {
 	if len(args) == 0 {
-		return 1, fmt.Errorf("usage: clother info <provider>")
+		return 1, fmt.Errorf("usage: cproxy info <provider>")
 	}
 	target, err := profiles.Resolve(args[0], c.Catalog, c.Config)
 	if err != nil {

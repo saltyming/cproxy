@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/jolehuit/clother/internal/runtime"
+	"github.com/saltyming/cproxy/internal/runtime"
 )
 
 func runUpdate(ctx context.Context, c Context) (int, error) {
@@ -14,7 +14,7 @@ func runUpdate(ctx context.Context, c Context) (int, error) {
 		if err != nil {
 			return 1, err
 		}
-		cmd := exec.CommandContext(ctx, brew, "upgrade", "clother")
+		cmd := exec.CommandContext(ctx, brew, "upgrade", "cproxy")
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr

@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jolehuit/clother/internal/providers"
+	"github.com/saltyming/cproxy/internal/providers"
 )
 
 type ProviderOverride struct {
@@ -91,7 +91,7 @@ func (cfg *File) ApplyLegacySecrets(secrets Secrets, catalog providers.Catalog) 
 		if _, ok := builtinSecretKeys[key]; ok {
 			continue
 		}
-		baseURLKey := "CLOTHER_" + key + "_BASE_URL"
+		baseURLKey := "CPROXY_" + key + "_BASE_URL"
 		baseURL := secrets[baseURLKey]
 		if baseURL == "" {
 			continue
@@ -166,8 +166,8 @@ func normalizeProviderOverrideModel(provider providers.Provider, value string) s
 
 func normalizeOpenRouterAliasName(name string) string {
 	name = strings.TrimSpace(strings.ToLower(name))
-	for strings.HasPrefix(name, "clother-or-") {
-		name = strings.TrimPrefix(name, "clother-or-")
+	for strings.HasPrefix(name, "cproxy-or-") {
+		name = strings.TrimPrefix(name, "cproxy-or-")
 	}
 	name = strings.Trim(name, "-")
 	return name
@@ -175,7 +175,7 @@ func normalizeOpenRouterAliasName(name string) string {
 
 func looksLikeLauncherName(value string) bool {
 	value = strings.TrimSpace(strings.ToLower(value))
-	return strings.HasPrefix(value, "clother-")
+	return strings.HasPrefix(value, "cproxy-")
 }
 
 func (cfg *File) OpenRouterNames() []string {

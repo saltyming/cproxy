@@ -5,13 +5,13 @@ import (
 	"io"
 	"sort"
 
-	"github.com/jolehuit/clother/internal/providers"
-	"github.com/jolehuit/clother/internal/version"
+	"github.com/saltyming/cproxy/internal/providers"
+	"github.com/saltyming/cproxy/internal/version"
 )
 
 func ShowBrief(w io.Writer) {
-	fmt.Fprintf(w, "Clother v%s - Multi-provider launcher for Claude CLI\n\n", version.Value)
-	fmt.Fprintln(w, "Usage: clother [options] <command>")
+	fmt.Fprintf(w, "Cproxy v%s - Multi-provider launcher for Claude CLI\n\n", version.Value)
+	fmt.Fprintln(w, "Usage: cproxy [options] <command>")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Commands:")
 	fmt.Fprintln(w, "  config       Configure a provider")
@@ -20,19 +20,19 @@ func ShowBrief(w io.Writer) {
 	fmt.Fprintln(w, "  test         Test providers")
 	fmt.Fprintln(w, "  status       Show installation state")
 	fmt.Fprintln(w, "  update       Update to latest version")
-	fmt.Fprintln(w, "  uninstall    Remove Clother")
+	fmt.Fprintln(w, "  uninstall    Remove Cproxy")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Tip: add --yolo to a launcher command to skip permission prompts.")
 	fmt.Fprintln(w)
-	fmt.Fprintln(w, "Run clother --help for full help.")
+	fmt.Fprintln(w, "Run cproxy --help for full help.")
 }
 
 func ShowFull(w io.Writer, catalog providers.Catalog) {
-	fmt.Fprintf(w, "Clother v%s\n", version.Value)
+	fmt.Fprintf(w, "Cproxy v%s\n", version.Value)
 	fmt.Fprintln(w, "Multi-provider launcher for Claude CLI")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Usage:")
-	fmt.Fprintln(w, "  clother [options] <command> [args]")
+	fmt.Fprintln(w, "  cproxy [options] <command> [args]")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Commands:")
 	fmt.Fprintln(w, "  config [provider]")
@@ -58,8 +58,8 @@ func ShowFull(w io.Writer, catalog providers.Catalog) {
 	fmt.Fprintln(w, "  --plain")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Launcher tips:")
-	fmt.Fprintln(w, "  clother-zai --yolo       skip permission prompts")
-	fmt.Fprintln(w, "  claude --yolo            same behavior via the Clother shim")
+	fmt.Fprintln(w, "  cproxy-zai --yolo       skip permission prompts")
+	fmt.Fprintln(w, "  claude --yolo            same behavior via the Cproxy shim")
 	fmt.Fprintln(w, "  --yolo                   shorthand for --dangerously-skip-permissions")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Providers:")

@@ -15,10 +15,10 @@ import (
 	"strings"
 )
 
-const defaultReleaseBaseURL = "https://github.com/jolehuit/clother/releases/download"
+const defaultReleaseBaseURL = "https://github.com/saltyming/cproxy/releases/download"
 
 func DownloadLatestIfNewer(ctx context.Context, current string) (string, string, func(), error) {
-	if os.Getenv("CLOTHER_SKIP_SELF_UPDATE") == "1" {
+	if os.Getenv("CPROXY_SKIP_SELF_UPDATE") == "1" {
 		return "", "", nil, nil
 	}
 
@@ -39,7 +39,7 @@ func DownloadLatestIfNewer(ctx context.Context, current string) (string, string,
 }
 
 func downloadReleaseBinary(ctx context.Context, version string) (string, func(), error) {
-	tmpDir, err := os.MkdirTemp("", "clother-update-*")
+	tmpDir, err := os.MkdirTemp("", "cproxy-update-*")
 	if err != nil {
 		return "", nil, err
 	}
@@ -53,7 +53,7 @@ func downloadReleaseBinary(ctx context.Context, version string) (string, func(),
 
 	assetPath := filepath.Join(tmpDir, assetName)
 	checksumsPath := filepath.Join(tmpDir, "checksums.txt")
-	binaryPath := filepath.Join(tmpDir, "clother")
+	binaryPath := filepath.Join(tmpDir, "cproxy")
 
 	if err := downloadFile(ctx, releaseAssetURL(version, assetName), assetPath); err != nil {
 		cleanup()
@@ -91,11 +91,11 @@ func releaseAssetName() (string, error) {
 		return "", fmt.Errorf("unsupported architecture %q", goruntime.GOARCH)
 	}
 
-	return fmt.Sprintf("clother_%s_%s.tar.gz", goruntime.GOOS, arch), nil
+	return fmt.Sprintf("cproxy_%s_%s.tar.gz", goruntime.GOOS, arch), nil
 }
 
 func releaseAssetURL(version, asset string) string {
-	if base := strings.TrimRight(strings.TrimSpace(os.Getenv("CLOTHER_RELEASE_BASE_URL")), "/"); base != "" {
+	if base := strings.TrimRight(strings.TrimSpace(os.Getenv("CPROXY_RELEASE_BASE_URL")), "/"); base != "" {
 		return base + "/" + asset
 	}
 	return strings.TrimRight(defaultReleaseBaseURL, "/") + "/" + displayVersion(version) + "/" + asset
@@ -106,7 +106,7 @@ func downloadFile(ctx context.Context, url, path string) error {
 	if err != nil {
 		return err
 	}
-	req.Header.Set("User-Agent", "clother-install")
+	req.Header.Set("User-Agent", "cproxy-install")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -193,7 +193,7 @@ func extractBinary(assetPath, binaryPath string) error {
 		if err != nil {
 			return err
 		}
-		if filepath.Base(header.Name) != "clother" {
+		if filepath.Base(header.Name) != "cproxy" {
 			continue
 		}
 
@@ -217,5 +217,5 @@ func extractBinary(assetPath, binaryPath string) error {
 		}
 		return os.Rename(tmpPath, binaryPath)
 	}
-	return fmt.Errorf("clother binary not found in %s", assetPath)
+	return fmt.Errorf("cproxy binary not found in %s", assetPath)
 }

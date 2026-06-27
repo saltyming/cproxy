@@ -20,6 +20,6 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/clother_*.tar.gz
+            dist/cproxy_*.tar.gz
             dist/checksums.txt
             dist/latest.json

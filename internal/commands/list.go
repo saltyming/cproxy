@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/profiles"
-	"github.com/jolehuit/clother/internal/providers"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/profiles"
+	"github.com/saltyming/cproxy/internal/providers"
 )
 
 func runList(_ context.Context, c Context) (int, error) {
@@ -26,7 +26,7 @@ func runList(_ context.Context, c Context) (int, error) {
 		for _, target := range targets {
 			payload.Profiles = append(payload.Profiles, item{
 				Name:       target.Profile,
-				Command:    "clother-" + target.Profile,
+				Command:    "cproxy-" + target.Profile,
 				Configured: configured(target, c.Secrets),
 			})
 		}
@@ -47,7 +47,7 @@ func runList(_ context.Context, c Context) (int, error) {
 		}
 		if len(targets) > 0 {
 			fmt.Fprintln(c.Output.Stdout)
-			fmt.Fprintln(c.Output.Stdout, "Run: clother-<name>")
+			fmt.Fprintln(c.Output.Stdout, "Run: cproxy-<name>")
 		}
 	}
 	return 0, nil

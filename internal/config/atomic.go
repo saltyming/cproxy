@@ -11,18 +11,24 @@ func writeAtomic(path string, data []byte, mode os.FileMode) error {
 		return err
 	}
 	tmpPath := tmp.Name()
-	defer os.Remove(tmpPath)
 
 	if _, err := tmp.Write(data); err != nil {
 		tmp.Close()
+		os.Remove(tmpPath)
 		return err
 	}
 	if err := tmp.Chmod(mode); err != nil {
 		tmp.Close()
+		os.Remove(tmpPath)
 		return err
 	}
 	if err := tmp.Close(); err != nil {
+		os.Remove(tmpPath)
 		return err
 	}
-	return os.Rename(tmpPath, path)
+	if err := os.Rename(tmpPath, path); err != nil {
+		os.Remove(tmpPath)
+		return err
+	}
+	return nil
 }

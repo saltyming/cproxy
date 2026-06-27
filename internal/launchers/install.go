@@ -7,33 +7,33 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/profiles"
-	"github.com/jolehuit/clother/internal/providers"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/profiles"
+	"github.com/saltyming/cproxy/internal/providers"
 )
 
 type Manifest struct {
 	Launchers []string `json:"launchers"`
 }
 
-// Sync installs the clother binary and provider symlinks into paths.BinDir.
+// Sync installs the cproxy binary and provider symlinks into paths.BinDir.
 //
 // When skipCopy is false (normal install), the binary at execPath is copied to
-// paths.BinDir/clother and symlinks are created relative to it.
+// paths.BinDir/cproxy and symlinks are created relative to it.
 //
 // When skipCopy is true (Homebrew install), no binary is copied; symlinks are
 // created as absolute references to execPath so that a Homebrew-managed binary
-// upgrade is reflected automatically without running `clother install` again.
+// upgrade is reflected automatically without running `cproxy install` again.
 func Sync(execPath string, paths config.Paths, catalog providers.Catalog, cfg *config.File, skipCopy bool) error {
 	if err := paths.EnsureBaseDirs(); err != nil {
 		return err
 	}
 
-	symlinkTarget := "clother" // relative — works when binary lives in the same dir
+	symlinkTarget := "cproxy" // relative — works when binary lives in the same dir
 	if skipCopy {
 		symlinkTarget = execPath // absolute — points directly to the Homebrew binary
 	} else {
-		destBinary := filepath.Join(paths.BinDir, "clother")
+		destBinary := filepath.Join(paths.BinDir, "cproxy")
 		if err := copyExecutable(execPath, destBinary); err != nil {
 			return err
 		}
@@ -43,7 +43,7 @@ func Sync(execPath string, paths config.Paths, catalog providers.Catalog, cfg *c
 	desired := map[string]struct{}{}
 	for _, target := range profiles.All(catalog, cfg) {
 		// Under Homebrew the formula already installs static provider symlinks in
-		// the Homebrew prefix, and clother-or / clother-custom cover dynamic
+		// the Homebrew prefix, and cproxy-or / cproxy-custom cover dynamic
 		// providers via gateway invocation. Skip individual dynamic symlinks to
 		// keep ~/bin clean for Homebrew users.
 		if skipCopy && isDynamicProfile(target.Profile, cfg) {
@@ -54,8 +54,8 @@ func Sync(execPath string, paths config.Paths, catalog providers.Catalog, cfg *c
 	// Always create gateway symlinks regardless of install method or whether
 	// any dynamic providers are configured. The isDynamicProfile skip above
 	// only applies to per-alias/per-provider symlinks, never to these gateways.
-	desired["clother-or"] = struct{}{}
-	desired["clother-custom"] = struct{}{}
+	desired["cproxy-or"] = struct{}{}
+	desired["cproxy-custom"] = struct{}{}
 
 	for _, old := range previous.Launchers {
 		if _, ok := desired[old]; ok {
@@ -106,7 +106,7 @@ func SaveManifest(path string, manifest Manifest) error {
 }
 
 func launcherName(profile string) string {
-	return "clother-" + profile
+	return "cproxy-" + profile
 }
 
 // isDynamicProfile reports whether a profile is user-defined (OpenRouter alias
@@ -139,17 +139,23 @@ func writeAtomic(path string, data []byte, mode os.FileMode) error {
 		return err
 	}
 	tmpPath := tmp.Name()
-	defer os.Remove(tmpPath)
 	if _, err := tmp.Write(data); err != nil {
 		tmp.Close()
+		os.Remove(tmpPath)
 		return err
 	}
 	if err := tmp.Chmod(mode); err != nil {
 		tmp.Close()
+		os.Remove(tmpPath)
 		return err
 	}
 	if err := tmp.Close(); err != nil {
+		os.Remove(tmpPath)
 		return err
 	}
-	return os.Rename(tmpPath, path)
+	if err := os.Rename(tmpPath, path); err != nil {
+		os.Remove(tmpPath)
+		return err
+	}
+	return nil
 }

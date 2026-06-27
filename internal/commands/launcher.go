@@ -3,9 +3,9 @@ package commands
 import (
 	"context"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/profiles"
-	"github.com/jolehuit/clother/internal/runtime"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/profiles"
+	"github.com/saltyming/cproxy/internal/runtime"
 )
 
 func RunLauncher(ctx context.Context, paths config.Paths, secrets config.Secrets, target profiles.Target, args []string, noBanner bool) (int, error) {

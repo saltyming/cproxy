@@ -3,9 +3,9 @@ package launchers
 import (
 	"fmt"
 
-	"github.com/jolehuit/clother/internal/config"
-	"github.com/jolehuit/clother/internal/profiles"
-	"github.com/jolehuit/clother/internal/providers"
+	"github.com/saltyming/cproxy/internal/config"
+	"github.com/saltyming/cproxy/internal/profiles"
+	"github.com/saltyming/cproxy/internal/providers"
 )
 
 func Resolve(argv0 string, catalog providers.Catalog, cfg *config.File) (profiles.Target, bool, error) {
