@@ -9,7 +9,6 @@
       "auth_mode": "none",
       "base_url": "",
       "default_model": "",
-      "model_tiers": {},
       "model_choices": [],
       "test_url": "https://api.anthropic.com",
       "setup": [],
@@ -25,11 +24,6 @@
       "key_var": "ZAI_API_KEY",
       "base_url": "https://api.z.ai/api/anthropic",
       "default_model": "glm-5.2",
-      "model_tiers": {
-        "haiku": "glm-5.2",
-        "sonnet": "glm-5.2",
-        "opus": "glm-5.2"
-      },
       "model_choices": [
         {
           "id": "glm-5.2",
@@ -66,11 +60,6 @@
       "key_var": "ZAI_CN_API_KEY",
       "base_url": "https://open.bigmodel.cn/api/anthropic",
       "default_model": "glm-5.2",
-      "model_tiers": {
-        "haiku": "glm-5.2",
-        "sonnet": "glm-5.2",
-        "opus": "glm-5.2"
-      },
       "model_choices": [
         {
           "id": "glm-5.2",
@@ -107,12 +96,6 @@
       "key_var": "MINIMAX_API_KEY",
       "base_url": "https://api.minimax.io/anthropic",
       "default_model": "MiniMax-M3",
-      "model_tiers": {
-        "haiku": "MiniMax-M3",
-        "sonnet": "MiniMax-M3",
-        "opus": "MiniMax-M3",
-        "small": "MiniMax-M3"
-      },
       "model_choices": [
         {
           "id": "MiniMax-M3",
@@ -169,12 +152,6 @@
       "key_var": "MINIMAX_CN_API_KEY",
       "base_url": "https://api.minimaxi.com/anthropic",
       "default_model": "MiniMax-M3",
-      "model_tiers": {
-        "haiku": "MiniMax-M3",
-        "sonnet": "MiniMax-M3",
-        "opus": "MiniMax-M3",
-        "small": "MiniMax-M3"
-      },
       "model_choices": [
         {
           "id": "MiniMax-M3",
@@ -231,9 +208,6 @@
       "key_var": "KIMI_API_KEY",
       "base_url": "https://api.kimi.com/coding/",
       "default_model": "kimi-k2.7-code",
-      "model_tiers": {
-        "small": "kimi-k2.7-code"
-      },
       "model_choices": [
         {
           "id": "kimi-k2.7-code",
@@ -260,7 +234,6 @@
       "key_var": "MOONSHOT_API_KEY",
       "base_url": "https://api.moonshot.ai/anthropic",
       "default_model": "kimi-k2.5",
-      "model_tiers": {},
       "model_choices": [
         {
           "id": "kimi-k2.7-code",
@@ -287,7 +260,6 @@
       "key_var": "ARK_API_KEY",
       "base_url": "https://ark.cn-beijing.volces.com/api/coding",
       "default_model": "doubao-seed-code-preview-latest",
-      "model_tiers": {},
       "model_choices": [],
       "test_url": "https://ark.cn-beijing.volces.com/api/coding",
       "setup": [],
@@ -303,9 +275,6 @@
       "key_var": "DEEPSEEK_API_KEY",
       "base_url": "https://api.deepseek.com/anthropic",
       "default_model": "deepseek-v4-flash",
-      "model_tiers": {
-        "small": "deepseek-v4-flash"
-      },
       "model_choices": [
         {
           "id": "deepseek-v4-flash",
@@ -332,11 +301,6 @@
       "key_var": "MIMO_API_KEY",
       "base_url": "https://api.xiaomimimo.com/anthropic",
       "default_model": "mimo-v2-pro",
-      "model_tiers": {
-        "haiku": "mimo-v2-flash",
-        "sonnet": "mimo-v2-pro",
-        "opus": "mimo-v2-pro"
-      },
       "model_choices": [
         {
           "id": "mimo-v2-pro",
@@ -365,11 +329,6 @@
       "key_var": "ALIBABA_API_KEY",
       "base_url": "https://coding-intl.dashscope.aliyuncs.com/apps/anthropic",
       "default_model": "qwen3.5-plus",
-      "model_tiers": {
-        "haiku": "qwen3-coder-flash",
-        "sonnet": "qwen3.5-plus",
-        "opus": "qwen3.5-plus"
-      },
       "model_choices": [
         {
           "id": "qwen3.5-plus",
@@ -451,11 +410,6 @@
       "key_var": "ALIBABA_API_KEY",
       "base_url": "https://coding-us.dashscope.aliyuncs.com/apps/anthropic",
       "default_model": "qwen3.5-plus",
-      "model_tiers": {
-        "haiku": "qwen3-coder-flash",
-        "sonnet": "qwen3.5-plus",
-        "opus": "qwen3.5-plus"
-      },
       "model_choices": [
         {
           "id": "qwen3.5-plus",
@@ -537,11 +491,6 @@
       "key_var": "ALIBABA_API_KEY",
       "base_url": "https://coding.dashscope.aliyuncs.com/apps/anthropic",
       "default_model": "qwen3.5-plus",
-      "model_tiers": {
-        "haiku": "qwen3-coder-flash",
-        "sonnet": "qwen3.5-plus",
-        "opus": "qwen3.5-plus"
-      },
       "model_choices": [
         {
           "id": "qwen3.5-plus",
@@ -623,7 +572,6 @@
       "literal_auth_token": "ollama",
       "base_url": "http://localhost:11434",
       "default_model": "",
-      "model_tiers": {},
       "model_choices": [],
       "test_url": "http://localhost:11434",
       "setup": [
@@ -645,7 +593,6 @@
       "literal_auth_token": "lmstudio",
       "base_url": "http://localhost:1234",
       "default_model": "",
-      "model_tiers": {},
       "model_choices": [],
       "test_url": "http://localhost:1234",
       "setup": [
@@ -666,7 +613,6 @@
       "auth_mode": "none",
       "base_url": "http://localhost:8000",
       "default_model": "",
-      "model_tiers": {},
       "model_choices": [],
       "test_url": "http://localhost:8000",
       "setup": [

@@ -92,27 +92,99 @@ func configBuiltin(c Context, provider providers.Provider) (int, error) {
 		}
 	}
 
-	if provider.DefaultModel != "" {
-		fmt.Fprintln(c.Output.Stdout, "Choose model:")
-		for idx, choice := range provider.ModelChoices {
-			fmt.Fprintf(c.Output.Stdout, "  %d. %-24s %s\n", idx+1, choice.ID, choice.Description)
+	if len(provider.ModelChoices) > 0 {
+		override := c.Config.ProviderOverrides[provider.ID]
+
+		promptOne := func(tier, header string, fallback string) error {
+			existing := tierValue(override, tier)
+			prefill := existing
+			if prefill == "" {
+				prefill = fallback
+			}
+			fmt.Fprintf(c.Output.Stdout, "\n%s tier (%s, current: %s):\n", tier, header, prefill)
+			for idx, choice := range provider.ModelChoices {
+				fmt.Fprintf(c.Output.Stdout, "  %d. %s — %s\n", idx+1, choice.ID, choice.Description)
+			}
+			answer, err := c.Prompt.Prompt(tier+" tier", prefill)
+			if err != nil {
+				return err
+			}
+			answer = resolveModelChoice(answer, provider.ModelChoices)
+			if strings.TrimSpace(answer) == "" {
+				answer = prefill
+			}
+			// Only persist when the user actually diverged from the
+			// prefill. Accepting the cascade default keeps the on-disk
+			// override empty so runtime cascade stays the source of truth.
+			if answer != prefill {
+				setTierField(&override, tier, answer)
+			}
+			return nil
 		}
-		defaultValue := provider.DefaultModel
-		if override := c.Config.ProviderOverrides[provider.ID]; override.Model != "" {
-			defaultValue = override.Model
-		}
-		answer, err := c.Prompt.Prompt("Model", defaultValue)
-		if err != nil {
+
+		// Opus prefill = provider.DefaultModel. Sonnet defaults to whatever
+		// the user picked (or the cascade chain). Haiku cascades from
+		// sonnet, small from haiku — every tier unwinds to DefaultModel.
+		opusFallback := provider.DefaultModel
+		if err := promptOne("opus", "most capable", opusFallback); err != nil {
 			return 1, err
 		}
-		answer = resolveModelChoice(answer, provider.ModelChoices)
-		if answer != "" && answer != provider.DefaultModel {
-			c.Config.ProviderOverrides[provider.ID] = config.ProviderOverride{Model: answer}
-		} else {
+		sonnetFallback := tierValue(override, "opus")
+		if sonnetFallback == "" {
+			sonnetFallback = opusFallback
+		}
+		if err := promptOne("sonnet", "balanced", sonnetFallback); err != nil {
+			return 1, err
+		}
+		haikuFallback := tierValue(override, "sonnet")
+		if haikuFallback == "" {
+			haikuFallback = sonnetFallback
+		}
+		if err := promptOne("haiku", "fast / cheap", haikuFallback); err != nil {
+			return 1, err
+		}
+		smallFallback := tierValue(override, "haiku")
+		if smallFallback == "" {
+			smallFallback = haikuFallback
+		}
+		if err := promptOne("small", "background tasks", smallFallback); err != nil {
+			return 1, err
+		}
+
+		if override.IsEmpty() {
 			delete(c.Config.ProviderOverrides, provider.ID)
+		} else {
+			c.Config.ProviderOverrides[provider.ID] = override
 		}
 	}
 	return persistConfig(c)
+}
+
+func tierValue(o config.ProviderOverride, tier string) string {
+	switch tier {
+	case "haiku":
+		return o.Haiku
+	case "sonnet":
+		return o.Sonnet
+	case "opus":
+		return o.Opus
+	case "small":
+		return o.Small
+	}
+	return ""
+}
+
+func setTierField(o *config.ProviderOverride, tier, value string) {
+	switch tier {
+	case "haiku":
+		o.Haiku = value
+	case "sonnet":
+		o.Sonnet = value
+	case "opus":
+		o.Opus = value
+	case "small":
+		o.Small = value
+	}
 }
 
 func configOpenRouter(c Context) (int, error) {
@@ -215,6 +287,7 @@ func configCustom(c Context) (int, error) {
 
 func persistConfig(c Context) (int, error) {
 	config.NormalizeLegacySecrets(c.Secrets, c.Catalog)
+	c.Config.Normalize(c.Catalog)
 	if err := config.SaveConfig(c.Paths.ConfigFile, c.Config); err != nil {
 		return 1, err
 	}

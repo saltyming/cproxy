@@ -17,7 +17,7 @@ func TestNormalizeRepairsLegacyProviderOverridesAndOpenRouterAliases(t *testing.
 	cfg := &File{
 		Version: 1,
 		ProviderOverrides: map[string]ProviderOverride{
-			"zai": {Model: "1"},
+			"zai": {Opus: "1"},
 		},
 		OpenRouterAliases: map[string]string{
 			"cproxy-or-kimi-k25": "cproxy-or-kimi-k25",
@@ -28,14 +28,42 @@ func TestNormalizeRepairsLegacyProviderOverridesAndOpenRouterAliases(t *testing.
 
 	cfg.Normalize(catalog)
 
-	if _, ok := cfg.ProviderOverrides["zai"]; ok {
-		t.Fatalf("expected default-model override to be removed, got %+v", cfg.ProviderOverrides)
+	override, ok := cfg.ProviderOverrides["zai"]
+	if !ok {
+		t.Fatalf("expected zai override to remain after index normalization, got %+v", cfg.ProviderOverrides)
+	}
+	if override.Opus != "glm-5.2" {
+		t.Fatalf("expected index 1 to resolve to first model choice, got %q", override.Opus)
 	}
 	if len(cfg.OpenRouterAliases) != 1 {
 		t.Fatalf("expected one valid OpenRouter alias, got %+v", cfg.OpenRouterAliases)
 	}
 	if cfg.OpenRouterAliases["kimi-k25"] != "moonshotai/kimi-k2.5" {
 		t.Fatalf("expected normalized alias to keep valid model, got %+v", cfg.OpenRouterAliases)
+	}
+}
+
+func TestNormalizeDropsEmptyProviderOverrides(t *testing.T) {
+	t.Parallel()
+
+	catalog, err := providers.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cfg := &File{
+		Version: 1,
+		ProviderOverrides: map[string]ProviderOverride{
+			"minimax": {},
+		},
+		OpenRouterAliases: map[string]string{},
+		CustomProviders:   map[string]CustomProvider{},
+	}
+
+	cfg.Normalize(catalog)
+
+	if _, ok := cfg.ProviderOverrides["minimax"]; ok {
+		t.Fatalf("expected empty override to be dropped, got %+v", cfg.ProviderOverrides)
 	}
 }
 

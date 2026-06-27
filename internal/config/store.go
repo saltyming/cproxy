@@ -13,7 +13,19 @@ import (
 )
 
 type ProviderOverride struct {
-	Model string `json:"model,omitempty"`
+	// Per-tier overrides. Each field supersedes the catalog tier model
+	// for the named claude code slot. Empty means "use the catalog
+	// tier value" — the entire override is dropped from the config
+	// file when no tier is set, so a tier-only override never grows
+	// stale entries.
+	Haiku  string `json:"haiku,omitempty"`
+	Sonnet string `json:"sonnet,omitempty"`
+	Opus   string `json:"opus,omitempty"`
+	Small  string `json:"small,omitempty"`
+}
+
+func (o ProviderOverride) IsEmpty() bool {
+	return o.Haiku == "" && o.Sonnet == "" && o.Opus == "" && o.Small == ""
 }
 
 type CustomProvider struct {
@@ -121,20 +133,27 @@ func (cfg *File) Normalize(catalog providers.Catalog) {
 	}
 
 	for id, override := range cfg.ProviderOverrides {
-		if strings.TrimSpace(override.Model) == "" {
-			delete(cfg.ProviderOverrides, id)
-			continue
-		}
 		provider, ok := catalog.Get(id)
 		if !ok {
 			continue
 		}
-		model := normalizeProviderOverrideModel(provider, override.Model)
-		if model == "" || model == provider.DefaultModel {
+		normalized := ProviderOverride{
+			Haiku:  normalizeOverrideValue(provider, override.Haiku),
+			Sonnet: normalizeOverrideValue(provider, override.Sonnet),
+			Opus:   normalizeOverrideValue(provider, override.Opus),
+			Small:  normalizeOverrideValue(provider, override.Small),
+		}
+		// Tier fields the user did not explicitly set fall back to the
+		// cascade chain at runtime (Opus → DefaultModel, Sonnet → Opus,
+		// Haiku → Sonnet, Small → Haiku). Keep every non-empty tier the
+		// user actually picked — even if it happens to equal the catalog
+		// default, persisting it preserves intent and avoids surprise
+		// drift on the next catalog bump.
+		if normalized.IsEmpty() {
 			delete(cfg.ProviderOverrides, id)
 			continue
 		}
-		cfg.ProviderOverrides[id] = ProviderOverride{Model: model}
+		cfg.ProviderOverrides[id] = normalized
 	}
 
 	normalizedAliases := map[string]string{}
@@ -151,7 +170,12 @@ func (cfg *File) Normalize(catalog providers.Catalog) {
 	cfg.OpenRouterAliases = normalizedAliases
 }
 
-func normalizeProviderOverrideModel(provider providers.Provider, value string) string {
+// normalizeOverrideValue accepts either a bare model id (kept as-is) or
+// the 1-based index of a ModelChoices entry. Indexes let `cproxy config`
+// persist "the user picked option 3" without us having to round-trip the
+// human-readable description; on read the value is rewritten to the
+// chosen model id, which is what the runtime actually consumes.
+func normalizeOverrideValue(provider providers.Provider, value string) string {
 	value = strings.TrimSpace(value)
 	if value == "" {
 		return ""

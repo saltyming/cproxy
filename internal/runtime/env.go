@@ -46,14 +46,12 @@ func BuildEnv(target profiles.Target, secrets config.Secrets) ([]string, error) 
 	if target.BaseURL != "" {
 		envMap["ANTHROPIC_BASE_URL"] = target.BaseURL
 	}
-	if target.Model != "" {
-		envMap["ANTHROPIC_MODEL"] = target.Model
-		if cw, ok := target.ModelContextWindows["default"]; ok {
-			if tokens := CompactWindowTokens(cw); tokens != "" {
-				envMap["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = tokens
-			}
-		}
-	}
+	// ANTHROPIC_MODEL is intentionally not emitted: tier variables
+	// (ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS}_MODEL) carry the model
+	// identity and override any ANTHROPIC_MODEL the parent shell may
+	// have leaked. Overrides in profiles.Resolve rewrite every tier
+	// to the same model, so the per-call main-model selection is
+	// already covered without ANTHROPIC_MODEL.
 	for key, value := range target.ModelTiers {
 		cw := target.ModelContextWindows[key]
 		annotated := WithContextSuffix(value, cw)
@@ -67,9 +65,18 @@ func BuildEnv(target profiles.Target, secrets config.Secrets) ([]string, error) 
 		case "small":
 			envMap["ANTHROPIC_SMALL_FAST_MODEL"] = annotated
 		}
-		if tokens := CompactWindowTokens(cw); tokens != "" {
-			envMap["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = tokens
+	}
+	// CLAUDE_CODE_AUTO_COMPACT_WINDOW must be the largest declared
+	// window across all tiers (and any default override) so /compact
+	// waits for the actual ceiling rather than the smallest tier's.
+	var maxTokens int
+	for _, cw := range target.ModelContextWindows {
+		if t, err := strconv.Atoi(CompactWindowTokens(cw)); err == nil && t > maxTokens {
+			maxTokens = t
 		}
+	}
+	if maxTokens > 0 {
+		envMap["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = strconv.Itoa(maxTokens)
 	}
 
 	switch target.AuthMode {

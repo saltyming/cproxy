@@ -39,16 +39,42 @@ func Invocation(argv0 string) (string, bool) {
 
 func Resolve(profile string, catalog providers.Catalog, cfg *config.File) (Target, error) {
 	if provider, ok := catalog.Get(profile); ok {
+		override := cfg.ProviderOverrides[profile]
+		opus := override.Opus
+		if opus == "" {
+			opus = provider.DefaultModel
+		}
+		sonnet := override.Sonnet
+		if sonnet == "" {
+			sonnet = opus
+		}
+		haiku := override.Haiku
+		if haiku == "" {
+			haiku = sonnet
+		}
+		small := override.Small
+		if small == "" {
+			small = haiku
+		}
+		tiers := map[string]string{
+			"opus":   opus,
+			"sonnet": sonnet,
+			"haiku":  haiku,
+			"small":  small,
+		}
+		// Pick the strongest tier the user explicitly set as the
+		// "main" model for /info display. Claude Code itself reads
+		// the per-tier variables, so this is purely cosmetic.
 		model := provider.DefaultModel
-		modelTiers := copyMap(provider.ModelTiers)
-		if override := cfg.ProviderOverrides[profile]; override.Model != "" {
-			model = override.Model
-			modelTiers = map[string]string{
-				"haiku":  override.Model,
-				"sonnet": override.Model,
-				"opus":   override.Model,
-				"small":  override.Model,
-			}
+		switch {
+		case override.Opus != "":
+			model = override.Opus
+		case override.Sonnet != "":
+			model = override.Sonnet
+		case override.Haiku != "":
+			model = override.Haiku
+		case override.Small != "":
+			model = override.Small
 		}
 		return Target{
 			Profile:             profile,
@@ -58,8 +84,8 @@ func Resolve(profile string, catalog providers.Catalog, cfg *config.File) (Targe
 			Family:              provider.Family,
 			BaseURL:             provider.BaseURL,
 			Model:               model,
-			ModelTiers:          compactModelTiers(modelTiers),
-			ModelContextWindows: collectContextWindows(catalog, model, modelTiers),
+			ModelTiers:          tiers,
+			ModelContextWindows: collectContextWindows(catalog, tiers),
 			AuthMode:            provider.AuthMode,
 			SecretKey:           provider.KeyVar,
 			LiteralAuthToken:    provider.LiteralAuthToken,
@@ -99,10 +125,15 @@ func Resolve(profile string, catalog providers.Catalog, cfg *config.File) (Targe
 			Family:      providers.FamilyCustomUnknown,
 			BaseURL:     custom.BaseURL,
 			Model:       custom.DefaultModel,
-			ModelTiers:  map[string]string{},
-			AuthMode:    providers.AuthSecret,
-			SecretKey:   custom.APIKeyEnv,
-			TestURL:     custom.BaseURL,
+			ModelTiers: map[string]string{
+				"opus":   custom.DefaultModel,
+				"sonnet": custom.DefaultModel,
+				"haiku":  custom.DefaultModel,
+				"small":  custom.DefaultModel,
+			},
+			AuthMode:  providers.AuthSecret,
+			SecretKey: custom.APIKeyEnv,
+			TestURL:   custom.BaseURL,
 		}, nil
 	}
 	return Target{}, fmt.Errorf("unknown profile %q", profile)
@@ -137,31 +168,17 @@ func copyMap(input map[string]string) map[string]string {
 }
 
 // collectContextWindows maps each tier ("haiku"/"sonnet"/"opus"/"small")
-// plus the literal "default" key to the catalog-declared context window of
-// the model that tier resolves to. Models without a catalogued context
-// window are omitted so callers can tell "unknown" from "explicit empty".
-func collectContextWindows(catalog providers.Catalog, defaultModel string, tiers map[string]string) map[string]string {
+// to the catalog-declared context window of the model that tier resolves
+// to. Models without a catalogued context window are omitted so callers
+// can tell "unknown" from "explicit empty".
+func collectContextWindows(catalog providers.Catalog, tiers map[string]string) map[string]string {
 	out := map[string]string{}
 	for tier, modelID := range tiers {
+		if modelID == "" {
+			continue
+		}
 		if cw := catalog.ContextWindowFor(modelID); cw != "" {
 			out[tier] = cw
-		}
-	}
-	if defaultModel != "" {
-		if cw := catalog.ContextWindowFor(defaultModel); cw != "" {
-			if _, exists := out["default"]; !exists {
-				out["default"] = cw
-			}
-		}
-	}
-	return out
-}
-
-func compactModelTiers(input map[string]string) map[string]string {
-	out := map[string]string{}
-	for key, value := range input {
-		if value != "" {
-			out[key] = value
 		}
 	}
 	return out

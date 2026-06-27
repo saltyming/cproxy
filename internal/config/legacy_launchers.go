@@ -41,9 +41,17 @@ func MigrateLegacyLaunchers(binDir string, catalog providers.Catalog, cfg *File)
 			}
 		}
 		if _, ok := builtin[profile]; ok {
+			// Legacy v1 shims exported a single ANTHROPIC_MODEL=...; the
+			// new schema is per-tier, so a legacy shim rewrites every
+			// tier to the same value, matching the old behaviour.
 			if model := envs["ANTHROPIC_MODEL"]; model != "" {
 				if provider, found := catalog.Get(profile); found && model != provider.DefaultModel {
-					cfg.ProviderOverrides[profile] = ProviderOverride{Model: model}
+					cfg.ProviderOverrides[profile] = ProviderOverride{
+						Haiku:  model,
+						Sonnet: model,
+						Opus:   model,
+						Small:  model,
+					}
 				}
 			}
 			continue

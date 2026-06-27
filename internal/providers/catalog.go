@@ -35,21 +35,20 @@ type ModelChoice struct {
 }
 
 type Provider struct {
-	ID               string            `json:"id"`
-	DisplayName      string            `json:"display_name"`
-	Description      string            `json:"description"`
-	Category         string            `json:"category"`
-	Family           Family            `json:"family"`
-	AuthMode         AuthMode          `json:"auth_mode"`
-	KeyVar           string            `json:"key_var,omitempty"`
-	LiteralAuthToken string            `json:"literal_auth_token,omitempty"`
-	BaseURL          string            `json:"base_url"`
-	DefaultModel     string            `json:"default_model"`
-	ModelTiers       map[string]string `json:"model_tiers"`
-	ModelChoices     []ModelChoice     `json:"model_choices"`
-	TestURL          string            `json:"test_url"`
-	Setup            []string          `json:"setup"`
-	Usage            []string          `json:"usage"`
+	ID               string        `json:"id"`
+	DisplayName      string        `json:"display_name"`
+	Description      string        `json:"description"`
+	Category         string        `json:"category"`
+	Family           Family        `json:"family"`
+	AuthMode         AuthMode      `json:"auth_mode"`
+	KeyVar           string        `json:"key_var,omitempty"`
+	LiteralAuthToken string        `json:"literal_auth_token,omitempty"`
+	BaseURL          string        `json:"base_url"`
+	DefaultModel     string        `json:"default_model"`
+	ModelChoices     []ModelChoice `json:"model_choices"`
+	TestURL          string        `json:"test_url"`
+	Setup            []string      `json:"setup"`
+	Usage            []string      `json:"usage"`
 }
 
 type Catalog struct {
@@ -71,9 +70,6 @@ func Load() (Catalog, error) {
 		contextWindows: make(map[string]string),
 	}
 	for _, provider := range payload.Providers {
-		if provider.ModelTiers == nil {
-			provider.ModelTiers = map[string]string{}
-		}
 		cat.ordered = append(cat.ordered, provider)
 		cat.byID[provider.ID] = provider
 		for _, choice := range provider.ModelChoices {

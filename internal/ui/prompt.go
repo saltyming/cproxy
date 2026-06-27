@@ -13,10 +13,19 @@ import (
 type Prompter struct {
 	In  io.Reader
 	Out io.Writer
+
+	reader *bufio.Reader
 }
 
 func NewPrompter(in io.Reader, out io.Writer) *Prompter {
 	return &Prompter{In: in, Out: out}
+}
+
+func (p *Prompter) readerFor() *bufio.Reader {
+	if p.reader == nil {
+		p.reader = bufio.NewReader(p.In)
+	}
+	return p.reader
 }
 
 func (p *Prompter) Prompt(label, defaultValue string) (string, error) {
@@ -25,8 +34,7 @@ func (p *Prompter) Prompt(label, defaultValue string) (string, error) {
 	} else {
 		fmt.Fprintf(p.Out, "%s: ", label)
 	}
-	reader := bufio.NewReader(p.In)
-	value, err := reader.ReadString('\n')
+	value, err := p.readerFor().ReadString('\n')
 	if err != nil && err != io.EOF {
 		return "", err
 	}

@@ -315,9 +315,22 @@ func TestBuildEnvAutoCompactHonoursOverriddenModel(t *testing.T) {
 		BaseURL:  "https://api.minimax.io/anthropic",
 		AuthMode: providers.AuthSecret,
 		SecretKey: "MINIMAX_API_KEY",
-		Model:     "MiniMax-M3",
+		// profiles.Resolve rewrites every tier to the override model,
+		// so by the time BuildEnv sees this Target ANTHROPIC_MODEL is
+		// intentionally absent and the override reaches Claude Code via
+		// the per-tier variables.
+		Model: "MiniMax-M3",
+		ModelTiers: map[string]string{
+			"haiku":  "MiniMax-M3",
+			"sonnet": "MiniMax-M3",
+			"opus":   "MiniMax-M3",
+			"small":  "MiniMax-M3",
+		},
 		ModelContextWindows: map[string]string{
-			"default": "1M",
+			"haiku":  "1M",
+			"sonnet": "1M",
+			"opus":   "1M",
+			"small":  "1M",
 		},
 	}
 
@@ -326,11 +339,112 @@ func TestBuildEnvAutoCompactHonoursOverriddenModel(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := envToMap(env)
-	if got["ANTHROPIC_MODEL"] != "MiniMax-M3" {
-		t.Fatalf("ANTHROPIC_MODEL = %q, want MiniMax-M3", got["ANTHROPIC_MODEL"])
+	if _, ok := got["ANTHROPIC_MODEL"]; ok {
+		t.Fatalf("ANTHROPIC_MODEL must not be emitted, got %q", got["ANTHROPIC_MODEL"])
+	}
+	if got["ANTHROPIC_DEFAULT_OPUS_MODEL"] != "MiniMax-M3[1m]" {
+		t.Fatalf("override tier should carry [1m] suffix, got %q", got["ANTHROPIC_DEFAULT_OPUS_MODEL"])
 	}
 	if got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] != "1000000" {
-		t.Fatalf("CLAUDE_CODE_AUTO_COMPACT_WINDOW = %q, want 1000000 (--model override should still annotate)",
+		t.Fatalf("CLAUDE_CODE_AUTO_COMPACT_WINDOW = %q, want 1000000", got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"])
+	}
+}
+
+func TestBuildEnvNeverEmitsAnthropicModel(t *testing.T) {
+	t.Parallel()
+
+	scenarios := []struct {
+		name    string
+		target  profiles.Target
+		secrets config.Secrets
+	}{
+		{
+			name: "third-party with tiers",
+			target: profiles.Target{
+				Family:   providers.FamilyAnthropicCompatibleNonClaude,
+				BaseURL:  "https://api.example.com/anthropic",
+				AuthMode: providers.AuthSecret,
+				SecretKey: "X_API_KEY",
+				ModelTiers: map[string]string{
+					"haiku": "m1",
+					"opus":  "m1",
+				},
+			},
+			secrets: config.Secrets{"X_API_KEY": "sk-x"},
+		},
+		{
+			name: "native has no model context",
+			target: profiles.Target{
+				Family:   providers.FamilyClaudeStrict,
+				AuthMode: providers.AuthNone,
+			},
+			secrets: config.Secrets{},
+		},
+		{
+			name: "override model still no ANTHROPIC_MODEL",
+			target: profiles.Target{
+				Family:   providers.FamilyAnthropicCompatibleNonClaude,
+				BaseURL:  "https://api.example.com/anthropic",
+				AuthMode: providers.AuthSecret,
+				SecretKey: "X_API_KEY",
+				Model:    "override-m",
+				ModelTiers: map[string]string{
+					"haiku": "override-m",
+					"opus":  "override-m",
+				},
+			},
+			secrets: config.Secrets{"X_API_KEY": "sk-x"},
+		},
+	}
+
+	for _, sc := range scenarios {
+		sc := sc
+		t.Run(sc.name, func(t *testing.T) {
+			t.Parallel()
+			env, err := BuildEnv(sc.target, sc.secrets)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, ok := envToMap(env)["ANTHROPIC_MODEL"]; ok {
+				t.Fatal("ANTHROPIC_MODEL must never be emitted; tier variables carry model identity")
+			}
+		})
+	}
+}
+
+func TestBuildEnvPicksMaxContextAcrossTiers(t *testing.T) {
+	t.Parallel()
+
+	target := profiles.Target{
+		Family:   providers.FamilyAnthropicCompatibleNonClaude,
+		BaseURL:  "https://api.example.com/anthropic",
+		AuthMode: providers.AuthSecret,
+		SecretKey: "X_API_KEY",
+		ModelTiers: map[string]string{
+			"haiku":  "small-model",
+			"sonnet": "big-model",
+			"opus":   "big-model",
+		},
+		ModelContextWindows: map[string]string{
+			"haiku":  "200K",
+			"sonnet": "1M",
+			"opus":   "1M",
+		},
+	}
+
+	env, err := BuildEnv(target, config.Secrets{"X_API_KEY": "sk-x"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := envToMap(env)
+	if got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] != "1000000" {
+		t.Fatalf("CLAUDE_CODE_AUTO_COMPACT_WINDOW = %q, want 1000000 (max of 200K, 1M, 1M)",
 			got["CLAUDE_CODE_AUTO_COMPACT_WINDOW"])
+	}
+	if got["ANTHROPIC_DEFAULT_HAIKU_MODEL"] != "small-model" {
+		t.Fatalf("haiku 200K should not carry [1m], got %q", got["ANTHROPIC_DEFAULT_HAIKU_MODEL"])
+	}
+	if got["ANTHROPIC_DEFAULT_SONNET_MODEL"] != "big-model[1m]" {
+		t.Fatalf("sonnet 1M should carry [1m], got %q", got["ANTHROPIC_DEFAULT_SONNET_MODEL"])
 	}
 }
